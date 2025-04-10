@@ -1,13 +1,24 @@
-app:
-  upload:
-    dir: "uploads" # 기본 업로드 디렉토리 경로
-
-jwt:
-  secret: "jlABLRWq2cLk7h5P60OmP6S0bsX7U11WoP0+E+esOYTjEqO5T/76wHagklpzSSM/1TmEYNsDel4sMhtZfgqxpVELe2alTcpeHt6zAZ5EWNDUVbAG4/sperdfj3nFrRH3u+lNHw=="
-  access-token-validity-in-milliseconds: 3600000 # 1시간
-  refresh-token-validity-in-milliseconds: 2592000000 # 30일
-
 spring:
+  application:
+    name: humanChatbot
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://192.168.0.32:3306/balancelab?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Seoul
+    username: root
+    password: 0000
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테이블 자동 생성/업데이트 (개발용, 프로덕션에서는 주의)
+    show-sql: true      # SQL 쿼리 로그 출력 (디버깅용)
+    properties:
+      hibernate:
+        format_sql: true  # SQL 포맷팅
+        dialect: org.hibernate.dialect.MariaDBDialect  # MariaDB dialect 명시
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
   security:
     oauth2:
       client:
@@ -19,5 +30,19 @@ spring:
         provider:
           google:
             issuer-uri: https://accounts.google.com
-  server:
-    port: 8080
+
+server:
+  port: 8080
+
+fastapi:
+  url: http://localhost:8000
+
+app:
+  upload:
+    dir: "uploads" # 기본 업로드 디렉토리 경로
+
+jwt:
+  secret: "jlABLRWq2cLk7h5P60OmP6S0bsX7U11WoP0+E+esOYTjEqO5T/76wHagklpzSSM/1TmEYNsDel4sMhtZfgqxpVELe2alTcpeHt6zAZ5EWNDUVbAG4/sperdfj3nFrRH3u+lNHw=="
+  access-token-validity-in-milliseconds: 3600000 # 1시간
+  refresh-token-validity-in-milliseconds: 2592000000 # 30일
+
