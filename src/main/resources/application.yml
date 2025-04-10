@@ -24,12 +24,13 @@ spring:
       client:
         registration:
           google:
-            client-id: your-google-client-id
-            client-secret: your-google-client-secret
-            scope:
-              - email
-              - profile
-            redirect-uri: http://localhost:3000/oauth/callback
+            client-id: 1043262579416-q58kv975bcfbh2asisaedsmhelf1hv7s.apps.googleusercontent.com
+            client-secret: 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
+            scope: openid,profile,email
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+
 server:
   port: 8080
 
@@ -38,4 +39,10 @@ fastapi:
 
 app:
   upload:
-    dir: uploads  # 파일 업로드 경로
+    dir: "uploads" # 기본 업로드 디렉토리 경로
+
+jwt:
+  secret: "jlABLRWq2cLk7h5P60OmP6S0bsX7U11WoP0+E+esOYTjEqO5T/76wHagklpzSSM/1TmEYNsDel4sMhtZfgqxpVELe2alTcpeHt6zAZ5EWNDUVbAG4/sperdfj3nFrRH3u+lNHw=="
+  access-token-validity-in-milliseconds: 3600000 # 1시간
+  refresh-token-validity-in-milliseconds: 2592000000 # 30일
+
