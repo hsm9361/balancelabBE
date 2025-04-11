@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.global.security;
 
+import com.ai.balancelab_be.domain.auth.handler.OAuth2SuccessHandler;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +22,12 @@ public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    public SecurityConfig(TokenProvider tokenProvider, ObjectMapper objectMapper) {
+    public SecurityConfig(TokenProvider tokenProvider, ObjectMapper objectMapper, OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.tokenProvider = tokenProvider;
         this.objectMapper = objectMapper;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
     @Bean

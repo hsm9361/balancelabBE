@@ -18,12 +18,20 @@ public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
+    private String email;
 
-    private int age;
-    private double height;
-    private double weight;
+    @Column(nullable = true)
+    private Integer age;
+
+    @Column(nullable = true)
+    private Double height;
+
+    @Column(nullable = true)
+    private Double weight;
+
+    @Column(nullable = true)
     private String gender;
-    private String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -32,7 +40,12 @@ public class Member implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id.toString();
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
     }
 
     @Override
