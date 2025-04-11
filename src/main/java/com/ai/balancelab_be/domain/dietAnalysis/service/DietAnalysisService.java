@@ -35,7 +35,7 @@ public class DietAnalysisService {
                 return response;
             } else {
                 System.out.println("FastAPI로부터 응답을 받았으나 null입니다.");
-                return new DietAnalysisResponse(List.of(), new Nutrition(0, 0, 0, 0, 0, 0), List.of(), List.of());
+                return new DietAnalysisResponse(List.of(), new Nutrition(0, 0, 0, 0, 0, 0, 0), List.of(), List.of());
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to analyze diet with FastAPI: " + e.getMessage());

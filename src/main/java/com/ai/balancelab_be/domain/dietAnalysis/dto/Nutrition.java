@@ -12,17 +12,20 @@ public class Nutrition {
     @JsonProperty("protein")
     private double protein;
 
-    @JsonProperty("fat")
-    private double fat;
-
     @JsonProperty("carbohydrate")
     private double carbohydrate;
 
+    @JsonProperty("water")
+    private double water;
+
+    @JsonProperty("sugar")
+    private double sugar;
+
+    @JsonProperty("fat")
+    private double fat;
+
     @JsonProperty("fiber")
     private double fiber;
-
-    @JsonProperty("calcium")
-    private double calcium;
 
     @JsonProperty("sodium")
     private double sodium;

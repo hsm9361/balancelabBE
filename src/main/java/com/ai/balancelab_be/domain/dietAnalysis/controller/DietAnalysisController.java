@@ -30,7 +30,7 @@ public class DietAnalysisController {
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             return ResponseEntity.badRequest().body(
-                    new DietAnalysisResponse(List.of(), new Nutrition(0, 0, 0, 0, 0, 0), List.of(), List.of())
+                    new DietAnalysisResponse(List.of(), new Nutrition(0, 0, 0, 0, 0, 0, 0), List.of(), List.of())
             );
         }
     }
