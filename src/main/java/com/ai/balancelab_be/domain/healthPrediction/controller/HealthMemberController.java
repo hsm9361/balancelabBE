@@ -2,6 +2,7 @@ package com.ai.balancelab_be.domain.healthPrediction.controller;
 
 import com.ai.balancelab_be.domain.healthPrediction.dto.memberDTO;
 import com.ai.balancelab_be.domain.healthPrediction.service.MemberService;
+import com.ai.balancelab_be.domain.healthPrediction.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,9 +21,13 @@ public class HealthMemberController {
     @GetMapping("/info")
     public ResponseEntity<memberDTO> getMemberInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long memberId = Long.parseLong(authentication.getName());
-        
-        memberDTO memberInfo = memberService.getMemberInfo(memberId);
-        return ResponseEntity.ok(memberInfo);
+        String email = authentication.getName();
+
+        try {
+            memberDTO memberInfo = memberService.getMemberInfo(email);
+            return ResponseEntity.ok(memberInfo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();  // Member가 없을 경우 404 반환
+        }
     }
-} 
+}

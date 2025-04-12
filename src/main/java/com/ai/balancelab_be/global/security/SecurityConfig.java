@@ -45,24 +45,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(oidcUserService())
                         )
-                        .successHandler((request, response, authentication) -> {
-                            String accessToken = tokenProvider.createAccessToken(authentication);
-                            String refreshToken = tokenProvider.createRefreshToken(authentication);
-
-                            MemberDto memberDto = MemberDto.builder()
-                                    .username(authentication.getName())
-                                    .email(authentication.getName())
-                                    .type("LOGIN_SUCCESS")
-                                    .accessToken(accessToken)
-                                    .refreshToken(refreshToken)
-                                    .build();
-
-                            String memberDtoJson = objectMapper.writeValueAsString(memberDto);
-                            String encodedData = URLEncoder.encode(memberDtoJson, StandardCharsets.UTF_8.toString());
-                            
-                            // 프론트엔드의 OAuth 콜백 페이지로 리다이렉트
-                            response.sendRedirect("http://localhost:3000/oauth/callback?data=" + encodedData);
-                        })
+                        .successHandler(oAuth2SuccessHandler) // ← 요거로 변경
                         .failureHandler((request, response, exception) -> {
                             MemberDto errorResponse = MemberDto.builder()
                                     .type("LOGIN_FAILURE")
