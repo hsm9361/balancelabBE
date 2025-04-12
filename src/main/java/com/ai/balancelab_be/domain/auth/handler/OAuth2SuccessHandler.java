@@ -1,15 +1,12 @@
 package com.ai.balancelab_be.domain.auth.handler;
 
 import com.ai.balancelab_be.domain.auth.service.AuthMemberService;
-import com.ai.balancelab_be.domain.healthPrediction.entity.Member;
-import com.ai.balancelab_be.domain.healthPrediction.repository.MemberRepository;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.ai.balancelab_be.global.security.TokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
