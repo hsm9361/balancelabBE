@@ -1,9 +1,9 @@
 package com.ai.balancelab_be.domain.healthPrediction.service;
 
 import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionRequest;
-import com.ai.balancelab_be.domain.healthPrediction.entity.Member;
+import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import com.ai.balancelab_be.domain.healthPrediction.entity.DailyRecord;
-import com.ai.balancelab_be.domain.healthPrediction.repository.MemberRepository;
+import com.ai.balancelab_be.domain.member.repository.MemberRepository;
 import com.ai.balancelab_be.domain.healthPrediction.repository.DailyRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,20 +30,20 @@ public class HealthPredictionService {
     private String fastApiUrl;
 
     public String predictHealth(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        MemberEntity memberEntity = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + memberId));
 
         // 최근 7일간의 기록 조회
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(6);
         
-        List<DailyRecord> records = dailyRecordRepository.findRecordsByMemberAndDateRange(
+        List<DailyRecord> records = dailyRecordRepository.findByMemberEntity_IdAndRecordDateBetween(
                 memberId, startDate, endDate);
 
         // FastAPI 요청 객체 생성
         HealthPredictionRequest request = new HealthPredictionRequest();
-        request.setAge(member.getAge());
-        request.setGender(member.getGender());
+        request.setAge(memberEntity.getAge());
+        request.setGender(memberEntity.getGender());
 
         // 영양소 값 계산
         if (!records.isEmpty()) {

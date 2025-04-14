@@ -1,8 +1,8 @@
 package com.ai.balancelab_be.domain.healthPrediction.entity;
 
+import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -17,7 +17,7 @@ public class DailyRecord {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private MemberEntity memberEntity;
 
     private LocalDate recordDate;
     private double carbo;

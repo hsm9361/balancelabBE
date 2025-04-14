@@ -11,11 +11,11 @@ import java.util.List;
 
 @Repository
 public interface DailyRecordRepository extends JpaRepository<DailyRecord, Long> {
-    
-    @Query("SELECT dr FROM DailyRecord dr WHERE dr.member.id = :memberId AND dr.recordDate BETWEEN :startDate AND :endDate")
-    List<DailyRecord> findRecordsByMemberAndDateRange(
+
+    @Query("SELECT d FROM DailyRecord d WHERE d.memberEntity.id = :memberId AND d.recordDate BETWEEN :start AND :end")
+    List<DailyRecord> findByMemberEntity_IdAndRecordDateBetween(
             @Param("memberId") Long memberId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
     );
-} 
+}

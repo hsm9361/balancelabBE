@@ -1,8 +1,8 @@
-package com.ai.balancelab_be.domain.healthPrediction.service;
+package com.ai.balancelab_be.domain.member.service;
 
-import com.ai.balancelab_be.domain.healthPrediction.dto.memberDTO;
-import com.ai.balancelab_be.domain.healthPrediction.entity.Member;
-import com.ai.balancelab_be.domain.healthPrediction.repository.MemberRepository;
+import com.ai.balancelab_be.domain.member.dto.MemberDto;
+import com.ai.balancelab_be.domain.member.entity.MemberEntity;
+import com.ai.balancelab_be.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,21 +15,21 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // 이메일을 통해 회원 정보 조회
-    public Member getMemberByEmail(String email) {
+    public MemberEntity getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with email: " + email));
     }
 
     @Transactional(readOnly = true)
-    public memberDTO getMemberInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MemberDto getMemberInfo(String email) {
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with email: " + email));
 
-        memberDTO dto = new memberDTO();
-        dto.setAge(member.getAge());
-        dto.setHeight(member.getHeight());
-        dto.setWeight(member.getWeight());
-        dto.setGender(member.getGender());
+        MemberDto dto = new MemberDto();
+        dto.setAge(memberEntity.getAge());
+        dto.setHeight(memberEntity.getHeight());
+        dto.setWeight(memberEntity.getWeight());
+        dto.setGender(memberEntity.getGender());
 
         return dto;
     }

@@ -1,37 +1,47 @@
-package com.ai.balancelab_be.domain.healthPrediction.entity;
+package com.ai.balancelab_be.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 @Entity
-@Table(name = "members")
+@Table(name = "tb_members")
 @Getter
 @Setter
-public class Member implements UserDetails {
+public class MemberEntity implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = true)
+
+    private String username;
     private Integer age;
-
-    @Column(nullable = true)
     private Double height;
-
-    @Column(nullable = true)
     private Double weight;
-
-    @Column(nullable = true)
     private String gender;
+    private String goal;
+
+    @CreationTimestamp
+    @Column(name = "reg_date")
+    private LocalDateTime insDate;
+
+    @UpdateTimestamp
+    @Column(name = "upd_date")
+    private LocalDateTime updDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,4 +77,4 @@ public class Member implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-} 
+}
