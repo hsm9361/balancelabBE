@@ -1,32 +1,30 @@
 package com.ai.balancelab_be.domain.dietAnalysis.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class Nutrition {
-    @JsonProperty("protein")
     private double protein;
-
-    @JsonProperty("carbohydrate")
     private double carbohydrate;
-
-    @JsonProperty("water")
     private double water;
-
-    @JsonProperty("sugar")
     private double sugar;
-
-    @JsonProperty("fat")
     private double fat;
-
-    @JsonProperty("fiber")
     private double fiber;
-
-    @JsonProperty("sodium")
     private double sodium;
+
+    // 기본 생성자
+    public Nutrition() {}
+
+    // 전체 필드 생성자
+    public Nutrition(double protein, double carbohydrate, double water, double sugar, double fat, double fiber, double sodium) {
+        this.protein = protein;
+        this.carbohydrate = carbohydrate;
+        this.water = water;
+        this.sugar = sugar;
+        this.fat = fat;
+        this.fiber = fiber;
+        this.sodium = sodium;
+    }
 }
