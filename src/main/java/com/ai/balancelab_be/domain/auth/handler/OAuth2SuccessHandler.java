@@ -37,11 +37,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = tokenProvider.createRefreshToken(authentication);
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = (String) oAuth2User.getAttributes().get("email");
+        String sub = (String) oAuth2User.getAttributes().get("sub");
         log.info("✅ OAuth2 인증 성공 - 사용자 이메일: {}", email);
-
+        log.info("✅ OAuth2 인증 성공 - 사용자 이메일: {}", sub);
 
         // 트랜잭션 서비스에서 저장
-        authMemberService.saveIfNotExists(email);
+        authMemberService.saveIfNotExists(email,sub);
 
         // 리다이렉트
         MemberDto memberDto = MemberDto.builder()
