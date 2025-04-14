@@ -6,6 +6,7 @@ import com.ai.balancelab_be.domain.calendar.repository.DailyDietRecordRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,15 @@ import java.util.stream.Collectors;
 public class DailyDietRecordService {
 
     private final DailyDietRecordRepository recordRepository;
+    public boolean deleteRecord(int foodId, int userId) {
+        return recordRepository.findByFoodIdAndUserId(foodId, userId)
+                .map(record -> {
+                    recordRepository.delete(record);
+                    return true;
+                })
+                .orElse(false);
+    }
+
 
     public void saveDietRecords(int userId, List<DailyDietRecordDto> dtos) {
         List<DailyDietRecord> entities = dtos.stream()
@@ -42,5 +52,9 @@ public class DailyDietRecordService {
                         .eatenDate(record.getEatenDate())
                         .build())
                 .collect(Collectors.toList());
+    }
+    // DailyDietRecordService.java
+    public List<DailyDietRecord> getRecords(int userId, LocalDateTime start, LocalDateTime end) {
+        return recordRepository.findByUserIdAndEatenDateBetween(userId, start, end);
     }
 }
