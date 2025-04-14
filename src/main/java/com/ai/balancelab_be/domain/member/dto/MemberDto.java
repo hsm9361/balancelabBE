@@ -16,6 +16,8 @@ public class MemberDto {
     private String type;
     private String accessToken;
     private String refreshToken;
+    private String hasRequiredInfo;
+    private String sub;
     private int age;
     private double height;
     private double weight;

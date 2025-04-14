@@ -1,7 +1,9 @@
 package com.ai.balancelab_be.domain.member.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,16 +15,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 @Entity
 @Table(name = "TB_MEMBERS")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Comment("이메일")
@@ -31,22 +35,37 @@ public class MemberEntity implements UserDetails {
 
     @Comment("유저이름")
     private String username;
+
     @Comment("나이")
-    private Integer age;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer age = 0; // 필드 초기화
+
     @Comment("키")
-    private Double height;
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double height = 0.0;
+
     @Comment("몸무게")
-    private Double weight;
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double weight = 0.0;
+
     @Comment("성별")
     private String gender;
+
     @Comment("목표")
     private String goal;
+
     @Comment("구글 고유 아이디")
     private String sub;
+
+    @Comment("프로필이미지경로")
+    private String profileImageUrl;
 
     @CreationTimestamp
     @Column(name = "reg_date")
     private LocalDateTime insDate;
+
+    @Comment("프로필 경로")
+    private String profileImgPath;
 
     @UpdateTimestamp
     @Column(name = "upd_date")
