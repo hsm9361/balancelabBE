@@ -1,8 +1,11 @@
 package com.ai.balancelab_be.domain.imageAnalysis.controller;
 
 import com.ai.balancelab_be.domain.imageAnalysis.service.ImageAnalysisService;
+import com.ai.balancelab_be.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,10 +25,15 @@ public class ImageAnalysisController {
     @Value("${app.upload.dir}")
     private String uploadDir; // application.yml에서 주입받은 경로
 
-    @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity<String> uploadAndAnalyzeImage(
+    @PostMapping(value = "/start", consumes = "multipart/form-data")
+    public ResponseEntity<String> start(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("userId") String userId) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
             // 업로드 디렉토리 생성 (없을 경우)
             Path homePath = Paths.get(System.getProperty("user.home"));
@@ -40,9 +48,9 @@ public class ImageAnalysisController {
             file.transferTo(filePath.toFile());
 
             // 이미지 분석 서비스 호출
-//            String analysisResult = imageAnalysisService.analyzeDiet(userId, filePath.toString());
+            String analysisResult = imageAnalysisService.analyzeDiet(userDetails.getMemberId(), filePath.toString());
 
-            return ResponseEntity.ok("Image uploaded and analyzed successfully: " + "ok");
+            return ResponseEntity.ok(analysisResult);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Failed to upload image: " + e.getMessage());
         }

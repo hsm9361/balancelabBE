@@ -4,7 +4,6 @@ import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.ai.balancelab_be.domain.member.dto.MemberInfoDto;
 import com.ai.balancelab_be.domain.member.dto.MemberUpdateDto;
 import com.ai.balancelab_be.domain.member.service.MemberService;
-import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import com.ai.balancelab_be.domain.member.repository.MemberRepository;
 import com.ai.balancelab_be.global.security.TokenProvider;
 import jakarta.validation.Valid;
@@ -15,12 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import com.ai.balancelab_be.global.security.CustomUserDetails;
 
 @RestController
