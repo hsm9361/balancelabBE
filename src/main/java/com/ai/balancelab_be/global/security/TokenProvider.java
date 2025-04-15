@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.global.security;
 
+import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -27,25 +28,27 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecret()));
     }
 
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, Long memberId) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + jwtProperties.getAccessTokenValidityInMilliseconds());
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", getAuthorities(authentication))
+                .claim("memberId", memberId)
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String createRefreshToken(Authentication authentication) {
+    public String createRefreshToken(Authentication authentication, Long memberId) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + jwtProperties.getRefreshTokenValidityInMilliseconds());
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
+                .claim("memberId", memberId)
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -64,9 +67,24 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        Long memberId = claims.get("memberId", Long.class);
+        MemberEntity member = new MemberEntity();
+        member.setId(memberId);
+        member.setEmail(claims.getSubject());
+        
+        CustomUserDetails principal = new CustomUserDetails(member);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public Long getMemberIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        
+        return claims.get("memberId", Long.class);
     }
 
     public boolean validateToken(String token) {

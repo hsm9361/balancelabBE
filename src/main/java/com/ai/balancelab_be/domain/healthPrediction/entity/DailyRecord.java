@@ -10,16 +10,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_daily_record")
+@Table(name = "TB_DAILY_RECORD")
 @Getter
-
+@Setter
 public class DailyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false, referencedColumnName = "id")
     private MemberEntity memberEntity;
 
     private double calories;

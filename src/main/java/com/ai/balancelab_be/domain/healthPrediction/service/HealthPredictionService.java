@@ -101,37 +101,32 @@ public class HealthPredictionService {
         return response;
     }
     @Transactional
-    public String savePredictionRecord(String email,
-                                       double dailyCarbohydrate, double dailySugar, double dailyFat, double dailySodium, double dailyFibrin, double dailyWater,
-                                       int historyDiabetes, int historyHypertension, int historyCvd,
-                                       double diabetesProba, double hypertensionProba, double cvdProba,
-                                       int smokeDaily, int drinkWeekly, int exerciseWeekly) {
+    public String savePredictionRecord(PredictionSaveDto predictDto) {
         try {
             // 회원 정보 조회
+            String email = predictDto.getEmail();
             MemberEntity member = memberRepository.findByEmail(email)
-                    .orElseGet(() -> {
-                        throw new IllegalArgumentException("Member not found with email: " + email);
-                    });
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found with email: " + email));
 
             // 예측 기록 생성
-            PredictRecord record = new PredictRecord();
-            record.setMemberEntity(member);
-            record.setDailyCarbohydrate(dailyCarbohydrate);
-            record.setDailySugar(dailySugar);
-            record.setDailyFat(dailyFat);
-            record.setDailySodium(dailySodium);
-            record.setDailyFibrin(dailyFibrin);
-            record.setDailyWater(dailyWater);
-            record.setHistoryDiabetes(historyDiabetes);
-            record.setHistoryHypertension(historyHypertension);
-            record.setHistoryCvd(historyCvd);
-            record.setDiabetesProba(diabetesProba);
-            record.setHypertensionProba(hypertensionProba);
-            record.setCvdProba(cvdProba);
-            record.setSmokeDaily(smokeDaily);
-            record.setDrinkWeekly(drinkWeekly);
-            record.setExerciseWeekly(exerciseWeekly);
-
+            PredictRecord record = PredictRecord.builder()
+                    .memberEntity(member)
+                    .dailyCarbohydrate(predictDto.getDailyCarbohydrate())
+                    .dailySugar(predictDto.getDailySugar())
+                    .dailyFat(predictDto.getDailyFat())
+                    .dailySodium(predictDto.getDailySodium())
+                    .dailyFibrin(predictDto.getDailyFibrin())
+                    .dailyWater(predictDto.getDailyWater())
+                    .historyDiabetes(predictDto.getHistoryDiabetes())
+                    .historyHypertension(predictDto.getHistoryHypertension())
+                    .historyCvd(predictDto.getHistoryCvd())
+                    .diabetesProba(predictDto.getDiabetesProba())
+                    .hypertensionProba(predictDto.getHypertensionProba())
+                    .cvdProba(predictDto.getCvdProba())
+                    .smokeDaily(predictDto.getSmokeDaily())
+                    .drinkWeekly(predictDto.getDrinkWeekly())
+                    .exerciseWeekly(predictDto.getExerciseWeekly())
+                    .build();
 
             // 예측 기록 저장
             predictRecordRepository.save(record);

@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.domain.member.repository;
 
+import com.ai.balancelab_be.domain.member.dto.MemberInfoDto;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
