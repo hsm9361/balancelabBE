@@ -13,10 +13,11 @@ public class AuthMemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberEntity saveIfNotExists(String email) {
+    public MemberEntity saveIfNotExists(String email, String sub) {
         return memberRepository.findByEmail(email).orElseGet(() -> {
             MemberEntity newMemberEntity = new MemberEntity();
             newMemberEntity.setEmail(email);
+            newMemberEntity.setSub(sub);
             return memberRepository.save(newMemberEntity);
         });
     }
@@ -25,7 +26,7 @@ public class AuthMemberService {
         // 이메일로 MemberEntity를 찾고 memberId를 반환하는 로직 구현
         // 예시:
         return memberRepository.findByEmail(email)
-                .map(MemberEntity::getMemberId)
+                .map(MemberEntity::getId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
     }
 }

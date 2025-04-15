@@ -43,7 +43,7 @@ public class HealthPredictionService {
         LocalDateTime endDate = LocalDate.now().atStartOfDay();
         LocalDateTime startDate = endDate.minusDays(7);
         
-        List<DailyRecord> records = dailyRecordRepository.findByMemberEntity_MemberIdAndRegDateBetween(
+        List<DailyRecord> records = dailyRecordRepository.findByMemberEntity_IdAndRegDateBetween(
                 memberId, startDate, endDate);
 
         // FastAPI 요청 객체 생성

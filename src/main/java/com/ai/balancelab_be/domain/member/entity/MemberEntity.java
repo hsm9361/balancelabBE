@@ -22,8 +22,8 @@ public class MemberEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "id")
+    private Long id;
 
 
     @Column(unique = true, nullable = false)
@@ -36,6 +36,10 @@ public class MemberEntity implements UserDetails {
     private Double weight;
     private String gender;
     private String goal;
+    private String has_required_info;
+    private String sub;
+    private String profile_image_url;
+    private String profile_img_path;
 
     @CreationTimestamp
     @Column(name = "reg_date")

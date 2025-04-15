@@ -31,7 +31,7 @@ public class MemberDto {
 
     public static MemberDto fromEntity(MemberEntity member) {
         return MemberDto.builder()
-                .id(member.getMemberId())
+                .id(member.getId())
                 .email(member.getEmail())
                 .username(member.getUsername())
                 .age(member.getAge())

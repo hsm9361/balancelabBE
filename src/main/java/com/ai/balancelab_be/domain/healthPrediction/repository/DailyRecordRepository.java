@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface DailyRecordRepository extends JpaRepository<DailyRecord, Long> {
-    List<DailyRecord> findByMemberEntity_MemberIdAndRegDateBetween(
+    List<DailyRecord> findByMemberEntity_IdAndRegDateBetween(
             Long member_id,
             LocalDateTime start,
             LocalDateTime end);
