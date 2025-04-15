@@ -2,6 +2,7 @@ package com.ai.balancelab_be.domain.healthPrediction.service;
 
 import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionRequest;
 import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionResponse;
+import com.ai.balancelab_be.domain.healthPrediction.dto.PredictionSaveDto;
 import com.ai.balancelab_be.domain.healthPrediction.entity.PredictRecord;
 import com.ai.balancelab_be.domain.healthPrediction.repository.PredictRecordRepository;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;

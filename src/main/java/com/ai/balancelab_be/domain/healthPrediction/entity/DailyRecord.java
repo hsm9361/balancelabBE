@@ -3,6 +3,7 @@ package com.ai.balancelab_be.domain.healthPrediction.entity;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
