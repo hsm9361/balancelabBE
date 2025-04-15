@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class MemberDto {
+    private long id;
     private String username;
     private String email;
     private String type;
@@ -30,6 +31,7 @@ public class MemberDto {
 
     public static MemberDto fromEntity(MemberEntity member) {
         return MemberDto.builder()
+                .id(member.getMemberId())
                 .email(member.getEmail())
                 .username(member.getUsername())
                 .age(member.getAge())

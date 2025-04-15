@@ -20,4 +20,12 @@ public class AuthMemberService {
             return memberRepository.save(newMemberEntity);
         });
     }
+
+    public Long getMemberIdByEmail(String email) {
+        // 이메일로 MemberEntity를 찾고 memberId를 반환하는 로직 구현
+        // 예시:
+        return memberRepository.findByEmail(email)
+                .map(MemberEntity::getMemberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+    }
 }

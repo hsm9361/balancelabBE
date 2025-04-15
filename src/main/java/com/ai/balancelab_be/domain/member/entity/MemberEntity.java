@@ -22,7 +22,9 @@ public class MemberEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "member_id")
+    private Long memberId;
+
 
     @Column(unique = true, nullable = false)
     private String email;
