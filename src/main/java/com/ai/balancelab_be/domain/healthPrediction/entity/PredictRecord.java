@@ -2,6 +2,7 @@ package com.ai.balancelab_be.domain.healthPrediction.entity;
 
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tb_predict_record")
 @Getter
-@Setter
+@Builder
 
 public class PredictRecord {
     @Id
