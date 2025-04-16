@@ -5,7 +5,7 @@ import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordDto;
 import java.util.List;
 
 public interface FoodRecordService {
-    FoodRecordDto createFoodRecord(FoodRecordDto foodRecordDto);
+    List<FoodRecordDto> createFoodRecord(List<FoodRecordDto> foodRecordDto);
     FoodRecordDto findById(Long id);
     List<FoodRecordDto> findByMemberId(Long memberId);
     List<FoodRecordDto> findByMemberIdAndGroupId(Long memberId, String groupId);
