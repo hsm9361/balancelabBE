@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.global.security;
 
+import com.ai.balancelab_be.domain.auth.handler.OAuth2SuccessHandler;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +22,12 @@ public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    public SecurityConfig(TokenProvider tokenProvider, ObjectMapper objectMapper) {
+    public SecurityConfig(TokenProvider tokenProvider, ObjectMapper objectMapper, OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.tokenProvider = tokenProvider;
         this.objectMapper = objectMapper;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
     @Bean
@@ -42,24 +45,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(oidcUserService())
                         )
-                        .successHandler((request, response, authentication) -> {
-                            String accessToken = tokenProvider.createAccessToken(authentication);
-                            String refreshToken = tokenProvider.createRefreshToken(authentication);
-
-                            MemberDto memberDto = MemberDto.builder()
-                                    .username(authentication.getName())
-                                    .email(authentication.getName())
-                                    .type("LOGIN_SUCCESS")
-                                    .accessToken(accessToken)
-                                    .refreshToken(refreshToken)
-                                    .build();
-
-                            String memberDtoJson = objectMapper.writeValueAsString(memberDto);
-                            String encodedData = URLEncoder.encode(memberDtoJson, StandardCharsets.UTF_8.toString());
-                            
-                            // 프론트엔드의 OAuth 콜백 페이지로 리다이렉트
-                            response.sendRedirect("http://localhost:3000/oauth/callback?data=" + encodedData);
-                        })
+                        .successHandler(oAuth2SuccessHandler) // ← 요거로 변경
                         .failureHandler((request, response, exception) -> {
                             MemberDto errorResponse = MemberDto.builder()
                                     .type("LOGIN_FAILURE")

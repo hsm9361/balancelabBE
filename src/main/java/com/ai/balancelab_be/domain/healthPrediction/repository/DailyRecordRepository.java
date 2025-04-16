@@ -7,15 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface DailyRecordRepository extends JpaRepository<DailyRecord, Long> {
-    
-    @Query("SELECT dr FROM DailyRecord dr WHERE dr.member.id = :memberId AND dr.recordDate BETWEEN :startDate AND :endDate")
-    List<DailyRecord> findRecordsByMemberAndDateRange(
-            @Param("memberId") Long memberId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
-    );
-} 
+    List<DailyRecord> findByMemberEntity_IdAndRegDateBetween(
+            Long member_id,
+            LocalDateTime start,
+            LocalDateTime end);
+
+}
