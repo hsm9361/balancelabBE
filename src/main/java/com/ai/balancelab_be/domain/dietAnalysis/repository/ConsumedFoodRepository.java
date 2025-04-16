@@ -13,8 +13,8 @@ public interface ConsumedFoodRepository extends JpaRepository<ConsumedFood, Long
     List<ConsumedFood> findByGroupId(Long groupId);
 
     // 사용자별 조회
-    List<ConsumedFood> findByEmail(String email);
+    List<ConsumedFood> findByMemberId(Long memberId);
 
     // 사용자와 날짜로 조회
-    List<ConsumedFood> findByEmailAndCreatedDate(String email, LocalDate createdDate);
+    List<ConsumedFood> findByMemberIdAndRegDate(Long memberId, LocalDate regDate);
 }

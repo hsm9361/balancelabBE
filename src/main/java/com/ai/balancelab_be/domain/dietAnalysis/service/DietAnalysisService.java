@@ -80,7 +80,7 @@ public class DietAnalysisService {
         // ConsumedFood 저장
         List<FoodNutrition> nutritionPerFood = response.getNutritionPerFood() != null ?
                 response.getNutritionPerFood() : Collections.emptyList();
-        String email = request.getEmail();
+        Long memberId = request.getMemberId();
         String mealTime = request.getMealTime();
 
         for (FoodNutrition foodNutrition : nutritionPerFood) {
@@ -92,7 +92,7 @@ public class DietAnalysisService {
             ConsumedFood consumedFood = new ConsumedFood();
             consumedFood.setFood(foodNutrition.getFood());
             consumedFood.setGroupId(groupId);
-            consumedFood.setEmail(email);
+            consumedFood.setMemberId(memberId);
             consumedFood.setMealTime(mealTime);
             Nutrition nutrition = foodNutrition.getNutrition();
             consumedFood.setProtein(nutrition.getProtein());
@@ -102,14 +102,14 @@ public class DietAnalysisService {
             consumedFood.setFat(nutrition.getFat());
             consumedFood.setFiber(nutrition.getFiber());
             consumedFood.setSodium(nutrition.getSodium());
-            consumedFood.setCreatedDate(LocalDate.now());
+            consumedFood.setRegDate(LocalDate.now());
             consumedFoodRepository.save(consumedFood);
         }
 
         // DeficientNutrient 저장
         DeficientNutrient deficientNutrient = new DeficientNutrient();
         deficientNutrient.setGroupId(groupId);
-        deficientNutrient.setCreatedDate(LocalDate.now());
+        deficientNutrient.setRegDate(LocalDate.now());
 
         List<String> deficientNutrients = response.getDeficientNutrients() != null ?
                 response.getDeficientNutrients() : Collections.emptyList();
@@ -129,7 +129,7 @@ public class DietAnalysisService {
             RecommendedMeal recommendedMeal = new RecommendedMeal();
             recommendedMeal.setGroupId(groupId);
             recommendedMeal.setMeal(meal);
-            recommendedMeal.setCreatedDate(LocalDate.now());
+            recommendedMeal.setRegDate(LocalDate.now());
             recommendedMealRepository.save(recommendedMeal);
         }
     }
@@ -141,7 +141,7 @@ public class DietAnalysisService {
         DietAnalysisResponse response = fetchFastApiResponse(request);
 
         // 2. DB에 저장
-        saveDietAnalysis(request, response);
+//        saveDietAnalysis(request, response);
 
         // 3. 결과 반환
         return response;

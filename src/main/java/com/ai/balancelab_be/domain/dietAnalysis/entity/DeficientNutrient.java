@@ -30,5 +30,5 @@ public class DeficientNutrient {
     private boolean fiber;
     private boolean sodium;
 
-    private LocalDate createdDate;
+    private LocalDate regDate;
 }

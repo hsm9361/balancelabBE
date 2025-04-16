@@ -1,0 +1,14 @@
+package com.ai.balancelab_be.domain.foodRecord.service;
+
+import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordDto;
+
+import java.util.List;
+
+public interface FoodRecordService {
+    FoodRecordDto createFoodRecord(FoodRecordDto foodRecordDto);
+    FoodRecordDto findById(Long id);
+    List<FoodRecordDto> findByMemberId(Long memberId);
+    List<FoodRecordDto> findByMemberIdAndGroupId(Long memberId, String groupId);
+    FoodRecordDto updateFoodRecord(Long id, FoodRecordDto foodRecordDto);
+    void deleteFoodRecord(Long id);
+}
