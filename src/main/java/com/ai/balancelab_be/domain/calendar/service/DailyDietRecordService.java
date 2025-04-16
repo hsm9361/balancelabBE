@@ -6,6 +6,7 @@ import com.ai.balancelab_be.domain.calendar.repository.DailyDietRecordRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +32,8 @@ public class DailyDietRecordService {
     }
 
     public List<DailyDietRecordDto> getDietRecordsByDateRange(int userId,
-                                                              java.time.LocalDateTime start,
-                                                              java.time.LocalDateTime end) {
+                                                              LocalDate start,
+                                                              LocalDate end) {
         return recordRepository.findByUserIdAndEatenDateBetween(userId, start, end).stream()
                 .map(record -> DailyDietRecordDto.builder()
                         .foodName(record.getFoodName())
