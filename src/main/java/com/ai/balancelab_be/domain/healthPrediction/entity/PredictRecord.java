@@ -11,26 +11,34 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_DAILY_RECORD")
+@Table(name = "tb_predict_record")
 @Getter
 @Setter
-public class DailyRecord {
+
+public class PredictRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private MemberEntity memberEntity;
 
-
-    private double carbo;
-    private double sugar;
-    private double fat;
-    private double sodium;
-    private double fibrin;
-    private double water;
+    private double dailyCarbohydrate;
+    private double dailySugar;
+    private double dailyFat;
+    private double dailySodium;
+    private double dailyFibrin;
+    private double dailyWater;
+    private int historyDiabetes;
+    private int historyHypertension;
+    private int historyCvd;
+    private double diabetesProba;
+    private double hypertensionProba;
+    private double cvdProba;
+    private int smokeDaily;
+    private int drinkWeekly;
+    private int exerciseWeekly;
 
     @CreationTimestamp
     @Column(name = "reg_date")
