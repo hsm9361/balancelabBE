@@ -57,9 +57,6 @@ public class MemberEntity implements UserDetails {
     @Comment("구글 고유 아이디")
     private String sub;
 
-    @Comment("프로필이미지경로")
-    private String profileImageUrl;
-
     @CreationTimestamp
     @Column(name = "reg_date")
     private LocalDateTime insDate;
