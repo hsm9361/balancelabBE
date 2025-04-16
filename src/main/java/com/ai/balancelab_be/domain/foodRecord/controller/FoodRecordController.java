@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -24,14 +25,17 @@ public class FoodRecordController {
     // 새로운 식단 기록을 생성하는 엔드포인트
     // 사용자가 인증된 경우에만 호출 가능하며, FoodRecordDto를 받아 DB에 저장
     @PostMapping("/create")
-    public ResponseEntity<FoodRecordDto> createFoodRecord(
+    public ResponseEntity<List<FoodRecordDto>> createFoodRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody FoodRecordDto foodRecordDto) {
+            @Valid @RequestBody List<FoodRecordDto> foodRecordDto) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        foodRecordDto.setMemberId(userDetails.getMemberId());
-        FoodRecordDto created = foodRecordService.createFoodRecord(foodRecordDto);
+        List<FoodRecordDto> dtoWithMemberId = foodRecordDto.stream()
+                .peek(dto -> dto.setMemberId(userDetails.getMemberId()))
+                .collect(Collectors.toList());
+
+        List<FoodRecordDto> created = foodRecordService.createFoodRecord(dtoWithMemberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

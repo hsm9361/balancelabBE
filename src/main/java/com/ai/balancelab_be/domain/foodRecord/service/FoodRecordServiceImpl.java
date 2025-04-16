@@ -19,10 +19,14 @@ public class FoodRecordServiceImpl implements FoodRecordService {
 
     @Transactional
     @Override
-    public FoodRecordDto createFoodRecord(FoodRecordDto foodRecordDto) {
-        FoodRecordEntity entity = mapToEntity(foodRecordDto);
-        FoodRecordEntity saved = foodRecordRepository.save(entity);
-        return mapToDto(saved);
+    public List<FoodRecordDto> createFoodRecord(List<FoodRecordDto> foodRecordDto) {
+        List<FoodRecordEntity> entities = foodRecordDto.stream()
+                .map(this::mapToEntity)
+                .collect(Collectors.toList());
+        List<FoodRecordEntity> saved = foodRecordRepository.saveAll(entities);
+        return saved.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
