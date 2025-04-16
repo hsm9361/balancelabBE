@@ -8,5 +8,5 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public interface ImageAnalysisService {
-    String analyzeDiet(String userId, String filePath);
+    String analyzeDiet(Long userId, String filePath);
 }

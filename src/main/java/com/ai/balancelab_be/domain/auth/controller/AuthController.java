@@ -26,8 +26,9 @@ public class AuthController {
             
             if (tokenProvider.validateToken(token)) {
                 Authentication authentication = tokenProvider.getAuthentication(token);
-                String newAccessToken = tokenProvider.createAccessToken(authentication);
-                String newRefreshToken = tokenProvider.createRefreshToken(authentication);
+                Long memberId = tokenProvider.getMemberIdFromToken(token);
+                String newAccessToken = tokenProvider.createAccessToken(authentication, memberId);
+                String newRefreshToken = tokenProvider.createRefreshToken(authentication, memberId);
 
                 MemberDto response = MemberDto.builder()
                         .email(authentication.getName())
