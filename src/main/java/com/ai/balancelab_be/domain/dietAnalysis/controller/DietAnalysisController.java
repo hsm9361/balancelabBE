@@ -4,8 +4,11 @@ import com.ai.balancelab_be.domain.dietAnalysis.dto.DietAnalysisRequest;
 import com.ai.balancelab_be.domain.dietAnalysis.dto.DietAnalysisResponse;
 import com.ai.balancelab_be.domain.dietAnalysis.dto.Nutrition;
 import com.ai.balancelab_be.domain.dietAnalysis.service.DietAnalysisService;
+import com.ai.balancelab_be.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -20,12 +23,17 @@ public class DietAnalysisController {
     @PostMapping(value = "/message")
     public ResponseEntity<DietAnalysisResponse> DietAnalysis(
             @RequestParam("message") String message,
-            @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "mealTime", required = false) String mealTime) { // mealTime 파라미터 추가
+            @RequestParam(value = "mealTime", required = false) String mealTime,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
+            System.out.println("멤버아이디: " + userDetails.getMemberId());
             System.out.println("컨트롤러 메세지: " + message);
-            System.out.println("컨트롤러 이메일: " + email);
-            System.out.println("컨트롤러 mealTime: " + mealTime); // mealTime 로그 추가
+            System.out.println("컨트롤러 mealTime: " + mealTime);
 
             // message를 앞뒤 공백을 제거한 후 빈 문자열인지 혹은 null인지 확인
             if (message == null || message.trim().isEmpty()) {
@@ -42,7 +50,8 @@ public class DietAnalysisController {
                 );
             }
 
-            DietAnalysisRequest dietAnalysisRequest = new DietAnalysisRequest(message, email, mealTime);
+            Long memberId = userDetails.getMemberId();
+            DietAnalysisRequest dietAnalysisRequest = new DietAnalysisRequest(message, memberId, mealTime);
             DietAnalysisResponse response = dietAnalysisService.getDietAnalysisResponse(dietAnalysisRequest);
             System.out.println("컨트롤러 (서비스에서 넘어온 전체값): " + response);
             System.out.println("컨트롤러 (foodList): " + response.getFoodList());

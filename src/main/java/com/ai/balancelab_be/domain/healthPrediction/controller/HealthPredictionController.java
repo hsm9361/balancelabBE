@@ -30,22 +30,7 @@ public class HealthPredictionController {
     @PostMapping("/savePrediction")
     public ResponseEntity<String> savePrediction(@RequestBody PredictionSaveDto dto) {
         String savePrediction=healthPredictionService.savePredictionRecord(
-                dto.getEmail(),
-                dto.getDailyCarbohydrate(),
-                dto.getDailySugar(),
-                dto.getDailyFat(),
-                dto.getDailySodium(),
-                dto.getDailyFibrin(),
-                dto.getDailyWater(),
-                dto.getHistoryDiabetes(),
-                dto.getHistoryHypertension(),
-                dto.getHistoryCvd(),
-                dto.getDiabetesProba(),
-                dto.getHypertensionProba(),
-                dto.getCvdProba(),
-                dto.getSmokeDaily(),
-                dto.getDrinkWeekly(),
-                dto.getExerciseWeekly()
+                dto
         );
         return ResponseEntity.ok(savePrediction);
     }

@@ -24,7 +24,8 @@ public class DailyRecord {
     @JoinColumn(name = "member_id", nullable = false, referencedColumnName = "id")
     private MemberEntity memberEntity;
 
-
+    private double calories;
+    private double protein;
     private double carbo;
     private double sugar;
     private double fat;

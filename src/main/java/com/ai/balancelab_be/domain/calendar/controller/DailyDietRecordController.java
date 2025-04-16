@@ -3,9 +3,12 @@ package com.ai.balancelab_be.domain.calendar.controller;
 import com.ai.balancelab_be.domain.calendar.dto.DailyDietRecordDto;
 import com.ai.balancelab_be.domain.calendar.service.DailyDietRecordService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -25,11 +28,9 @@ public class DailyDietRecordController {
     @GetMapping("/list")
     public List<DailyDietRecordDto> getDietRecords(
             @RequestParam int userId,
-            @RequestParam String startDate,
-            @RequestParam String endDate
-    ) {
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
-        return recordService.getDietRecordsByDateRange(userId, start, end);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ){
+        return recordService.getDietRecordsByDateRange(userId, startDate, endDate);
     }
 }

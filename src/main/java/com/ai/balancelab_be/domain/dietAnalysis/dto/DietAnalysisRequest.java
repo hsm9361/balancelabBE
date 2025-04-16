@@ -1,6 +1,5 @@
 package com.ai.balancelab_be.domain.dietAnalysis.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,18 +7,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DietAnalysisRequest {
     private String message;
-    private String email;
+    private Long memberId;
     private String mealTime;
 
-    public DietAnalysisRequest(String message, String email, String mealTime) {
+    public DietAnalysisRequest(String message, Long memberId, String mealTime) {
         this.message = message;
-        this.email = email;
+        this.memberId = memberId;
         this.mealTime = mealTime;
     }
 
-    public DietAnalysisRequest(String message, String email) {
+    public DietAnalysisRequest(String message, Long memberId) {
         this.message = message;
-        this.email = email;
+        this.memberId = memberId;
     }
 
     public DietAnalysisRequest(String message) {

@@ -3,7 +3,9 @@ package com.ai.balancelab_be.domain.calendar.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "dailydiet_record")
@@ -35,7 +37,7 @@ public class DailyDietRecord {
     private String unit;
 
     @Column(name = "eaten_date")
-    private LocalDateTime eatenDate;
+    private LocalDate eatenDate;
 
     @Column(name = "ins_date")
     private LocalDateTime insDate;

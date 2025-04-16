@@ -2,7 +2,8 @@ package com.ai.balancelab_be.domain.calendar.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +14,6 @@ public class DailyDietRecordDto {
     private String category;
     private float intakeAmount;
     private String unit;
-    private LocalDateTime eatenDate;
+    private LocalDate eatenDate;
 
 }

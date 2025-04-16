@@ -24,7 +24,7 @@ public class ConsumedFood {
 
     private Long groupId;
 
-    private String email;
+    private Long memberId;
 
     private String mealTime;
 
@@ -36,5 +36,5 @@ public class ConsumedFood {
     private double fiber;
     private double sodium;
 
-    private LocalDate createdDate;
+    private LocalDate regDate;
 }
