@@ -24,5 +24,5 @@ public class RecommendedMeal {
 
     private String meal;
 
-    private LocalDate createdDate;
+    private LocalDate regDate;
 }
