@@ -11,6 +11,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,6 +85,28 @@ public class FoodRecordController {
         List<FoodRecordDto> records = foodRecordService.findByMemberIdAndGroupId(userDetails.getMemberId(), groupId);
         return ResponseEntity.ok(records);
     }
+
+    // 회원 ID와 날짜로 식단 기록을 조회하는 엔드포인트
+    @GetMapping("/member/date")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<FoodRecordDto>> getFoodRecordsByMemberAndDate(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("date") String date) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(date); // YYYY-MM-DD
+            // LocalDate를 LocalDateTime으로 변환 (하루 시작: 00:00:00)
+            LocalDateTime startOfDay = parsedDate.atStartOfDay();
+            List<FoodRecordDto> records = foodRecordService.findByMemberIdAndConsumedDate(
+                    userDetails.getMemberId(), startOfDay);
+            return ResponseEntity.ok(records);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
     // 기존 식단 기록을 업데이트하는 엔드포인트
     // 인증된 사용자가 자신의 식단 기록만 수정할 수 있도록 제한

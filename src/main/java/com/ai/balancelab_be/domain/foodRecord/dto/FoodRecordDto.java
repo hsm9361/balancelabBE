@@ -62,4 +62,6 @@ public class FoodRecordDto {
     private LocalDateTime regDate;
 
     private LocalDateTime uptDate;
+
+    private LocalDateTime consumedDate;
 }

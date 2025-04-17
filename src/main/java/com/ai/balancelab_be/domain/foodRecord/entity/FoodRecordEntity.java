@@ -88,7 +88,7 @@ public class FoodRecordEntity {
 
     @Comment("식사 날짜")
     @Column(name="consumed_date", nullable = false)
-    private LocalDate consumedDate;
+    private LocalDateTime consumedDate;
 
     @CreationTimestamp
     @Column(name = "reg_date")
