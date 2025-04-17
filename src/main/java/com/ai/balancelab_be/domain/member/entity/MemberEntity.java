@@ -51,18 +51,21 @@ public class MemberEntity implements UserDetails {
     @Comment("성별")
     private String gender;
 
-    @Comment("목표")
-    private String goal;
+    @Comment("목표 몸무게")
+    private Double goalWeight;
 
     @Comment("구글 고유 아이디")
     private String sub;
+
+    @Comment("프로필이미지경로")
+    private String profileImageUrl;
 
     @CreationTimestamp
     @Column(name = "reg_date")
     private LocalDateTime insDate;
 
-    @Comment("프로필 경로")
-    private String profileImgPath;
+    @Comment("활동수준")
+    private String activityLevel;
 
     @UpdateTimestamp
     @Column(name = "upd_date")

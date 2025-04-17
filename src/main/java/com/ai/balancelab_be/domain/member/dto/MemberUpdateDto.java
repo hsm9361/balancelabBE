@@ -27,6 +27,12 @@ public class MemberUpdateDto {
     @Size(max = 10, message = "Gender must be less than 10 characters")
     private String gender;
 
+    //목표 몸무게
+    private Double goalWeight;
+
+    //활동량
+    private String activityLevel;
+
     // profileImageUrl → MultipartFile
     private MultipartFile profileImage;
 }

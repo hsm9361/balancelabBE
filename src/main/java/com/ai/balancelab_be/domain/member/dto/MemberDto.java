@@ -18,12 +18,13 @@ public class MemberDto {
     private String accessToken;
     private String refreshToken;
     private String hasRequiredInfo;
+    private String activityLevel;
     private String sub;
     private int age;
     private double height;
     private double weight;
     private String gender;
-    private String goal;
+    private double goalWeight;
     private double carbo_perday;
     private double sugar_perday;
     private double fat_perday;
@@ -39,8 +40,9 @@ public class MemberDto {
                 .age(member.getAge())
                 .height(member.getHeight())
                 .weight(member.getWeight())
+                .activityLevel(member.getActivityLevel())
                 .gender(member.getGender())
-                .goal(member.getGoal())
+                .goalWeight(member.getGoalWeight())
                 .type("LOGIN_SUCCESS")
                 .accessToken("dummy_access")   // 실제 토큰 로직 추가 가능
                 .refreshToken("dummy_refresh") // 실제 토큰 로직 추가 가능
