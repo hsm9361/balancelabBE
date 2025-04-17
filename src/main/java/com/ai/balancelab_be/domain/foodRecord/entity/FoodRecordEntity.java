@@ -86,6 +86,10 @@ public class FoodRecordEntity {
     @Column(name = "reg_date")
     private LocalDateTime regDate;
 
+    @CreationTimestamp
+    @Column(name = "consumed_date")
+    private LocalDateTime consumed_date;
+
     @UpdateTimestamp
     @Column(name = "upt_date")
     private LocalDateTime uptDate;

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class ImageAnalysisController {
     private String uploadDir; // application.yml에서 주입받은 경로
 
     @PostMapping(value = "/start", consumes = "multipart/form-data")
-    public ResponseEntity<String> start(
+    public ResponseEntity<Map<String, Object>> start(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -48,11 +49,11 @@ public class ImageAnalysisController {
             file.transferTo(filePath.toFile());
 
             // 이미지 분석 서비스 호출
-            String analysisResult = imageAnalysisService.analyzeDiet(userDetails.getMemberId(), filePath.toString());
+            Map<String, Object> analysisResult = imageAnalysisService.analyzeDiet(userDetails.getMemberId(), filePath.toString());
 
             return ResponseEntity.ok(analysisResult);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Failed to upload image: " + e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
