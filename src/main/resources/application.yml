@@ -34,6 +34,10 @@ spring:
         provider:
           google:
             issuer-uri: https://accounts.google.com
+  schedule:
+    cron: 0 0 0 * * *
+    use: true
+
 
 server:
   port: 8080

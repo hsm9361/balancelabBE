@@ -1,4 +1,4 @@
-package com.ai.balancelab_be.domain.healthPrediction.entity;
+package com.ai.balancelab_be.domain.foodRecord.entity;
 
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
@@ -11,10 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_DAILY_RECORD")
+@Table(name = "TB_DAILY_NUTRITION_RECORD",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "record_date"})}
+)
 @Getter
 @Setter
-public class DailyRecord {
+public class DailyNutritionRecordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,6 +34,9 @@ public class DailyRecord {
     private double sodium;
     private double fibrin;
     private double water;
+
+    @Column(name = "consumed_date", nullable = false)
+    private LocalDate consumedDate;
 
     @CreationTimestamp
     @Column(name = "reg_date")

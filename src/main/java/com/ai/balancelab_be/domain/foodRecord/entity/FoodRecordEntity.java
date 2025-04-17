@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.domain.foodRecord.entity;
 
+import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,10 +11,13 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_FOOD_RECORD")
+@Table(name = "TB_FOOD_RECORD",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "consumed_date"})}
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -81,6 +85,10 @@ public class FoodRecordEntity {
     @Comment("식사 시간")
     @Column(name = "meal_time", nullable = false)
     private String mealTime;
+
+    @Comment("식사 날짜")
+    @Column(name="consumed_date", nullable = false)
+    private LocalDate consumedDate;
 
     @CreationTimestamp
     @Column(name = "reg_date")
