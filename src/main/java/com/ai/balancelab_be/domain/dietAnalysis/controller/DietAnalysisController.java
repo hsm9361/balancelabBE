@@ -23,7 +23,6 @@ public class DietAnalysisController {
     @PostMapping(value = "/message")
     public ResponseEntity<DietAnalysisResponse> DietAnalysis(
             @RequestParam("message") String message,
-            @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "mealTime", required = false) String mealTime,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -34,7 +33,6 @@ public class DietAnalysisController {
         try {
             System.out.println("멤버아이디: " + userDetails.getMemberId());
             System.out.println("컨트롤러 메세지: " + message);
-            System.out.println("컨트롤러 이메일: " + email);
             System.out.println("컨트롤러 mealTime: " + mealTime);
 
             // message를 앞뒤 공백을 제거한 후 빈 문자열인지 혹은 null인지 확인
