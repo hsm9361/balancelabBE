@@ -9,7 +9,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class DailyDietRecordDto {
+    private int foodId;
     private String foodName;
     private String category;
     private float intakeAmount;

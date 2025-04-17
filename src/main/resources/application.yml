@@ -1,6 +1,6 @@
 spring:
   application:
-    name: balancelab
+    name: balancelabb
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/balancelab?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Seoul

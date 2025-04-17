@@ -1,11 +1,16 @@
 package com.ai.balancelab_be.domain.calendar.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 @Data
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
 public class DailyDietRecordResponseDto {
     private int foodId;
     private String foodName;
