@@ -1,14 +1,13 @@
 package com.ai.balancelab_be.domain.healthPrediction.service;
 
 import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionRequest;
-import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionResponse;
 import com.ai.balancelab_be.domain.healthPrediction.dto.PredictionSaveDto;
 import com.ai.balancelab_be.domain.healthPrediction.entity.PredictRecord;
 import com.ai.balancelab_be.domain.healthPrediction.repository.PredictRecordRepository;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
-import com.ai.balancelab_be.domain.healthPrediction.entity.DailyRecord;
+import com.ai.balancelab_be.domain.foodRecord.entity.DailyNutritionRecordEntity;
 import com.ai.balancelab_be.domain.member.repository.MemberRepository;
-import com.ai.balancelab_be.domain.healthPrediction.repository.DailyRecordRepository;
+import com.ai.balancelab_be.domain.foodRecord.repository.DailyNutritionRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -28,7 +27,7 @@ import java.util.List;
 public class HealthPredictionService {
 
     private final MemberRepository memberRepository;
-    private final DailyRecordRepository dailyRecordRepository;
+    private final DailyNutritionRecordRepository dailyNutritionRecordRepository;
     private final RestTemplate restTemplate;
     private final PredictRecordRepository predictRecordRepository;
 
@@ -44,7 +43,7 @@ public class HealthPredictionService {
         LocalDateTime endDate = LocalDate.now().atStartOfDay();
         LocalDateTime startDate = endDate.minusDays(7);
         
-        List<DailyRecord> records = dailyRecordRepository.findByMemberEntity_IdAndRegDateBetween(
+        List<DailyNutritionRecordEntity> records = dailyNutritionRecordRepository.findByMemberEntity_IdAndRegDateBetween(
                 memberId, startDate, endDate);
 
         // FastAPI 요청 객체 생성
@@ -61,7 +60,7 @@ public class HealthPredictionService {
             double totalFibrin = 0;
             double totalWater = 0;
 
-            for (DailyRecord record : records) {
+            for (DailyNutritionRecordEntity record : records) {
                 totalCarbo += record.getCarbo();
                 totalSugar += record.getSugar();
                 totalFat += record.getFat();
