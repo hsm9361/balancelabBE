@@ -44,31 +44,31 @@ public class FoodRecordEntity {
 
     @Comment("탄수화물")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double carbohydrates = 0.0;
+    private Double carbohydrates;
 
     @Comment("지방")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double fat = 0.0;
+    private Double fat;
 
     @Comment("섬유질")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double fiber = 0.0;
+    private Double fiber;
 
     @Comment("단백질")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double protein = 0.0;
+    private Double protein;
 
     @Comment("나트륨")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double sodium = 0.0;
+    private Double sodium;
 
     @Comment("설탕")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double sugar = 0.0;
+    private Double sugar;
 
     @Comment("물")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double water = 0.0;
+    private Double water;
 
     @Comment("타입 (image, text, custom)")
     @Column(nullable = false)
@@ -80,7 +80,7 @@ public class FoodRecordEntity {
 
     @Comment("먹은 양")
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double amount = 0.0;
+    private Double amount;
 
     @Comment("식사 시간")
     @Column(name = "meal_time", nullable = false)
@@ -93,10 +93,6 @@ public class FoodRecordEntity {
     @CreationTimestamp
     @Column(name = "reg_date")
     private LocalDateTime regDate;
-
-    @CreationTimestamp
-    @Column(name = "consumed_date")
-    private LocalDateTime consumed_date;
 
     @UpdateTimestamp
     @Column(name = "upt_date")

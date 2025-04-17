@@ -57,7 +57,7 @@ public class DailyNutritionRecordService {
                         map.put("unit", record.getUnit());
                         return map;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
 
 
             // AI 서버 요청
@@ -67,7 +67,7 @@ public class DailyNutritionRecordService {
                     "date", today.toString()
             );
 
-            Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
+            Map response = restTemplate.postForObject(url, requestBody, Map.class);
 
             if (response == null || response.isEmpty()) {
                 throw new RuntimeException("영양 정보 조회 실패 for member: " + member.getId());
