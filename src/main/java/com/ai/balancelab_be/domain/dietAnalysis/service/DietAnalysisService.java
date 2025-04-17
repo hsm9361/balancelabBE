@@ -36,7 +36,7 @@ public class DietAnalysisService {
     // FastAPI로부터 분석 결과 가져오기
     public DietAnalysisResponse fetchFastApiResponse(DietAnalysisRequest request) {
         try {
-            String url = fastApiUrl + "/analysis/foodName";
+            String url = fastApiUrl + "/analysis/diet";
             System.out.println("서비스단체크 (요청 데이터): " + request.getMessage());
 
             DietAnalysisResponse response = restTemplate.postForObject(url, request, DietAnalysisResponse.class);
