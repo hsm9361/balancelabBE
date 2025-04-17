@@ -18,5 +18,7 @@ public class MemberInfoDto {
     private Double height;
     private Double weight;
     private String gender;
+    private String activityLevel;
+    private Double goalWeight;
     private String profileImageUrl;
 }

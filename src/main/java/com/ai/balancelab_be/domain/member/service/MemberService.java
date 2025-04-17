@@ -30,6 +30,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     @Value("${app.upload.dir}")
     private String uploadDir; // application.yml에서 주입받은 경로
+
+    @Value("${app.profiles-dir}")
+    private String profilesDir;
+
     // 이메일을 통해 회원 정보 조회
     public MemberEntity getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
@@ -67,6 +71,9 @@ public class MemberService {
                 .height(member.getHeight())
                 .weight(member.getWeight())
                 .gender(member.getGender())
+                .goalWeight(member.getGoalWeight())
+                .activityLevel(member.getActivityLevel())
+                .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
@@ -123,6 +130,8 @@ public class MemberService {
         if (updateDto.getHeight() != null) member.setHeight(updateDto.getHeight());
         if (updateDto.getWeight() != null) member.setWeight(updateDto.getWeight());
         if (updateDto.getGender() != null) member.setGender(updateDto.getGender());
+        if (updateDto.getActivityLevel() != null) member.setActivityLevel(updateDto.getActivityLevel());
+        if (updateDto.getGoalWeight() != null) member.setGoalWeight(updateDto.getGoalWeight());
 
         memberRepository.save(member);
 
@@ -135,6 +144,8 @@ public class MemberService {
                 .weight(member.getWeight())
                 .gender(member.getGender())
                 .profileImageUrl(member.getProfileImageUrl())
+                .activityLevel(member.getActivityLevel())
+                .goalWeight(member.getGoalWeight())
                 .build();
     }
 }

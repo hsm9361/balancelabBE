@@ -57,6 +57,7 @@ public class MemberController {
         return ResponseEntity.ok(memberInfoDto);
     }
 
+    //정보가져오는 부분
     @GetMapping("/info")
     public ResponseEntity<MemberInfoDto> getMemberInfo(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -67,6 +68,8 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+
+    //업데이트하는부분
     @PostMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MemberInfoDto> updateMemberInfo(

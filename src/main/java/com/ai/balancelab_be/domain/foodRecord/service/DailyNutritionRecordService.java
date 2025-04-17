@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,15 +27,13 @@ public class DailyNutritionRecordService {
     private final FoodRecordRepository foodRecordRepository; // 음식 기록 접근용
     private final RestTemplate restTemplate = new RestTemplate(); // 또는 @Bean으로 등록
 
-    @Scheduled(cron = "0 22 11 * * *") // 매일 오후 11시 59분
+    @Scheduled(cron = "0 59 23 * * *")
     @Transactional
     public void scheduledNutritionCalculation() {
         LocalDate today = LocalDate.now();
 
-        // 1. 오늘 먹은 음식 기록만 가져오기
         List<FoodRecordEntity> todayFoodRecords = foodRecordRepository.findByConsumedDate(today);
 
-        // 2. 멤버별로 그룹핑
         Map<Long, List<FoodRecordEntity>> groupedByMember = todayFoodRecords.stream()
                 .collect(Collectors.groupingBy(FoodRecordEntity::getMemberId));
 
@@ -45,46 +44,67 @@ public class DailyNutritionRecordService {
 
             List<FoodRecordEntity> foodRecords = entry.getValue();
 
-            // 3. 이미 해당 멤버의 기록이 있다면 skip (중복 저장 방지)
-
             boolean exists = dailyNutritionRecordRepository
                     .existsByMemberEntity_IdAndConsumedDate(member.getId(), today);
             if (exists) continue;
 
-            // 4. 음식 이름만 추출
-            List<String> foodNames = foodRecords.stream()
-                    .map(FoodRecordEntity::getFoodName)
+            // 🔄 음식 이름 + 양 + 단위로 구성된 리스트 생성
+            List<Map<String, Object>> foodList = foodRecords.stream()
+                    .map(record -> {
+                        Map<String, Object> map = new HashMap<>(); // HashMap 사용
+                        map.put("name", record.getFoodName());
+                        map.put("amount", record.getAmount());
+                        map.put("unit", record.getUnit());
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
-            // 5. AI 서버 호출
+
+            // AI 서버 요청
             String url = "http://localhost:8000/nutrition/calculate";
             Map<String, Object> requestBody = Map.of(
-                    "foodNames", foodNames,
+                    "foodList", foodList,
                     "date", today.toString()
             );
 
-            Map<String, Double> response = restTemplate.postForObject(url, requestBody, Map.class);
+            Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
 
-            if (response == null) {
+            if (response == null || response.isEmpty()) {
                 throw new RuntimeException("영양 정보 조회 실패 for member: " + member.getId());
             }
 
-            // 6. DailyNutritionRecord 생성 및 저장
+            Map<String, Object> data = (Map<String, Object>) response.get("data");
+            if (data == null) {
+                throw new RuntimeException("응답에 data 필드가 없습니다 for member: " + member.getId());
+            }
+
+            // 👇 응답에서 JSON 파싱
             DailyNutritionRecordEntity record = new DailyNutritionRecordEntity();
             record.setMemberEntity(member);
-            record.setConsumedDate(today); // 새로 추가한 필드
-            record.setCalories(response.getOrDefault("calories", 0.0));
-            record.setProtein(response.getOrDefault("protein", 0.0));
-            record.setCarbo(response.getOrDefault("carbo", 0.0));
-            record.setSugar(response.getOrDefault("sugar", 0.0));
-            record.setFat(response.getOrDefault("fat", 0.0));
-            record.setSodium(response.getOrDefault("sodium", 0.0));
-            record.setFibrin(response.getOrDefault("fibrin", 0.0));
-            record.setWater(response.getOrDefault("water", 0.0));
+            record.setConsumedDate(today);
+            record.setCarbo(toDouble(data.get("탄수화물")));
+            record.setProtein(toDouble(data.get("단백질")));
+            record.setFat(toDouble(data.get("지방")));
+            record.setSugar(toDouble(data.get("당분")));
+            record.setSodium(toDouble(data.get("나트륨")));
+            record.setFibrin(toDouble(data.get("식이섬유")));
+            record.setWater(toDouble(data.get("수분")));
+            record.setCalories(toDouble(data.get("칼로리")));
 
             dailyNutritionRecordRepository.save(record);
         }
     }
 
-
+    // 응답이 Double 또는 String일 수 있어서 안전하게 변환
+    private Double toDouble(Object obj) {
+        if (obj == null) return 0.0;  // null 값 처리
+        if (obj instanceof Number) {
+            return ((Number) obj).doubleValue();  // Number 타입이면 그대로 Double로 변환
+        }
+        try {
+            return Double.parseDouble(obj.toString());  // String 타입이면 숫자로 변환
+        } catch (Exception e) {
+            return 0.0;  // 변환 실패 시 기본값 0.0
+        }
+    }
 }

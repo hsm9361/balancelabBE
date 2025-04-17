@@ -1,5 +1,8 @@
 package com.ai.balancelab_be.global.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -8,22 +11,43 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    private static final Logger logger = LoggerFactory.getLogger(WebConfig.class);
+
+    @Value("${app.upload-dir}")
+    private String uploadDir;
+
+    @Value("${app.profiles-dir}")
+    private String profilesDir;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS 적용
-                .allowedOrigins("http://localhost:3000") // React 개발 서버
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드
-                .allowedHeaders("*") // 모든 헤더 허용
-                .allowCredentials(true); // 쿠키/인증 정보 포함 허용
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String normalizedPath = Paths.get(uploadDir).normalize().toString().replace("\\", "/");
+        String resourceLocation = "file:" + normalizedPath + "/";
+
+        File dir = new File(normalizedPath);
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            logger.info("Upload directory {}: {}", normalizedPath, created ? "created" : "failed to create");
+        }
+
+        // uploads와 하위 폴더(profiles 등) 매핑
+        logger.info("Mapping /uploads/** to {}", resourceLocation);
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:./uploads/");
+                .addResourceLocations(resourceLocation);
     }
 
     @Bean
