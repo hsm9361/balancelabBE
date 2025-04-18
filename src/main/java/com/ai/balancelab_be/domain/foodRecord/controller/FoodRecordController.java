@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class FoodRecordController {
     // 새로운 식단 기록을 생성하는 엔드포인트
     // 사용자가 인증된 경우에만 호출 가능하며, FoodRecordDto를 받아 DB에 저장
     @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<FoodRecordDto>> createFoodRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody List<FoodRecordDto> foodRecordDto) {
@@ -81,6 +84,27 @@ public class FoodRecordController {
         }
         List<FoodRecordDto> records = foodRecordService.findByMemberIdAndGroupId(userDetails.getMemberId(), groupId);
         return ResponseEntity.ok(records);
+    }
+
+    @GetMapping("/member/date-range")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<FoodRecordDto>> getFoodRecordsByDateRange(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("start") String startDateStr,
+            @RequestParam("end") String endDateStr) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            LocalDate start = LocalDate.parse(startDateStr);
+            LocalDate end = LocalDate.parse(endDateStr);
+            List<FoodRecordDto> records = foodRecordService.findByMemberIdAndConsumedDateBetween(
+                    userDetails.getMemberId(), start, end);
+            return ResponseEntity.ok(records);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     // 기존 식단 기록을 업데이트하는 엔드포인트

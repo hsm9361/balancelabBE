@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,12 @@ public class FoodRecordServiceImpl implements FoodRecordService {
     @Override
     public List<FoodRecordDto> findByMemberIdAndGroupId(Long memberId, String groupId) {
         List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndGroupId(memberId, groupId);
+        return entities.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FoodRecordDto> findByMemberIdAndConsumedDateBetween(Long memberId, LocalDate start, LocalDate end) {
+        List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndConsumedDateBetween(memberId, start, end);
         return entities.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
