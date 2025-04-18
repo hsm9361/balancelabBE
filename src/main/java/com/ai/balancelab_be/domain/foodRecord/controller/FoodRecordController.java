@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ public class FoodRecordController {
     // 새로운 식단 기록을 생성하는 엔드포인트
     // 사용자가 인증된 경우에만 호출 가능하며, FoodRecordDto를 받아 DB에 저장
     @PostMapping("/create")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<FoodRecordDto>> createFoodRecord(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody List<FoodRecordDto> foodRecordDto) {
@@ -86,26 +86,27 @@ public class FoodRecordController {
         return ResponseEntity.ok(records);
     }
 
-    @GetMapping("/member/date-range")
+    // 회원 ID와 날짜로 식단 기록을 조회하는 엔드포인트
+    @GetMapping("/member/date")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<FoodRecordDto>> getFoodRecordsByDateRange(
+    public ResponseEntity<List<FoodRecordDto>> getFoodRecordsByMemberAndDate(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam("start") String startDateStr,
-            @RequestParam("end") String endDateStr) {
+            @RequestParam("date") String date) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         try {
-            LocalDate start = LocalDate.parse(startDateStr);
-            LocalDate end = LocalDate.parse(endDateStr);
-            List<FoodRecordDto> records = foodRecordService.findByMemberIdAndConsumedDateBetween(
-                    userDetails.getMemberId(), start, end);
+            LocalDate parsedDate = LocalDate.parse(date); // YYYY-MM-DD
+            // LocalDate를 LocalDateTime으로 변환 (하루 시작: 00:00:00)
+            LocalDateTime startOfDay = parsedDate.atStartOfDay();
+            List<FoodRecordDto> records = foodRecordService.findByMemberIdAndConsumedDate(
+                    userDetails.getMemberId(), startOfDay);
             return ResponseEntity.ok(records);
         } catch (DateTimeParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.badRequest().body(null);
         }
     }
+
 
     // 기존 식단 기록을 업데이트하는 엔드포인트
     // 인증된 사용자가 자신의 식단 기록만 수정할 수 있도록 제한

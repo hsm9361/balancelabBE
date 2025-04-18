@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,12 +50,6 @@ public class FoodRecordServiceImpl implements FoodRecordService {
         return entities.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    @Override
-    public List<FoodRecordDto> findByMemberIdAndConsumedDateBetween(Long memberId, LocalDate start, LocalDate end) {
-        List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndConsumedDateBetween(memberId, start, end);
-        return entities.stream().map(this::mapToDto).collect(Collectors.toList());
-    }
-
     @Transactional
     @Override
     public FoodRecordDto updateFoodRecord(Long id, FoodRecordDto foodRecordDto) {
@@ -73,6 +68,14 @@ public class FoodRecordServiceImpl implements FoodRecordService {
             throw new ResourceNotFoundException("Food record not found with id: " + id);
         }
         foodRecordRepository.deleteById(id);
+    }
+
+    @Override
+    public List<FoodRecordDto> findByMemberIdAndConsumedDate(Long memberId, LocalDateTime consumedDate) {
+        List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndConsumedDate(memberId, consumedDate);
+        return entities.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     private FoodRecordEntity mapToEntity(FoodRecordDto dto) {
@@ -94,6 +97,7 @@ public class FoodRecordServiceImpl implements FoodRecordService {
                 .mealTime(dto.getMealTime())
                 .regDate(dto.getRegDate())
                 .uptDate(dto.getUptDate())
+                .consumedDate(dto.getConsumedDate())
                 .build();
     }
 
