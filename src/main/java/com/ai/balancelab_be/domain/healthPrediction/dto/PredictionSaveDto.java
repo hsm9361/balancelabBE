@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PredictionSaveDto {
-    private String email;
+    private Long memberId;
     private double dailyCarbohydrate;
     private double dailySugar;
     private double dailyFat;

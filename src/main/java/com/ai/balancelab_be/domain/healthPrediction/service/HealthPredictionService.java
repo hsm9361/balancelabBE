@@ -123,9 +123,9 @@ public class HealthPredictionService {
     public String savePredictionRecord(PredictionSaveDto predictDto) {
         try {
             // 회원 정보 조회
-            String email = predictDto.getEmail();
-            MemberEntity member = memberRepository.findByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("Member not found with email: " + email));
+            Long memberId = predictDto.getMemberId();
+            MemberEntity member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found with memberId: " + memberId));
 
             // 예측 기록 생성
             PredictRecord record = PredictRecord.builder()
