@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.domain.foodRecord.service;
 
+import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto;
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordDto;
 import com.ai.balancelab_be.domain.foodRecord.entity.FoodRecordEntity;
 import com.ai.balancelab_be.domain.foodRecord.repository.FoodRecordRepository;
@@ -77,6 +78,14 @@ public class FoodRecordServiceImpl implements FoodRecordService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<FoodRecordCountDto> getFoodRecordCounts(Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+        System.out.println("시작"+startDate);
+
+        return foodRecordRepository.findFoodRecordCountByDateRange(memberId, startDate, endDate);
+    }
+
 
     private FoodRecordEntity mapToEntity(FoodRecordDto dto) {
         return FoodRecordEntity.builder()
