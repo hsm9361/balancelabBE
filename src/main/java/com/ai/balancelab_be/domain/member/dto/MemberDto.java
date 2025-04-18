@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class MemberDto {
     private long id;
     private String username;
+    private String membername;
     private String email;
     private String type;
     private String accessToken;
@@ -37,6 +38,7 @@ public class MemberDto {
                 .id(member.getId())
                 .email(member.getEmail())
                 .username(member.getUsername())
+                .membername(member.getMembername())
                 .age(member.getAge())
                 .height(member.getHeight())
                 .weight(member.getWeight())

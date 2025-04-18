@@ -34,7 +34,7 @@ public class MemberEntity implements UserDetails {
     private String email;
 
     @Comment("유저이름")
-    private String username;
+    private String membername;
 
     @Comment("나이")
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")

@@ -39,11 +39,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = (String) oAuth2User.getAttributes().get("email");
         String sub = (String) oAuth2User.getAttributes().get("sub");
+        String username = (String) oAuth2User.getAttributes().get("name");
         log.info("✅ OAuth2 인증 성공 - 사용자 이메일: {}", email);
         log.info("✅ OAuth2 인증 성공 - 사용자 sub: {}", sub);
 
         // 트랜잭션 서비스에서 저장하고 MemberEntity 반환
-        MemberEntity member = authMemberService.saveIfNotExists(email, sub);
+        MemberEntity member = authMemberService.saveIfNotExists(email, sub, username);
 
         // CustomUserDetails 생성
         CustomUserDetails userDetails = new CustomUserDetails(member);
