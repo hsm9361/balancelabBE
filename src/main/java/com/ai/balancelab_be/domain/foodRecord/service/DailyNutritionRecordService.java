@@ -8,9 +8,13 @@ import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import com.ai.balancelab_be.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -67,13 +71,19 @@ public class DailyNutritionRecordService {
                     "date", today.toString()
             );
 
-            Map response = restTemplate.postForObject(url, requestBody, Map.class);
+            Map<String, Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(requestBody),
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            ).getBody();
 
             if (response == null || response.isEmpty()) {
                 throw new RuntimeException("영양 정보 조회 실패 for member: " + member.getId());
             }
 
             Map<String, Object> data = (Map<String, Object>) response.get("data");
+
             if (data == null) {
                 throw new RuntimeException("응답에 data 필드가 없습니다 for member: " + member.getId());
             }

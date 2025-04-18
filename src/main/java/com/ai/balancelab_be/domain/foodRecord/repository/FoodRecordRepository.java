@@ -11,7 +11,5 @@ public interface FoodRecordRepository extends JpaRepository<FoodRecordEntity, Lo
     List<FoodRecordEntity> findByMemberId(Long memberId);
     List<FoodRecordEntity> findByMemberIdAndGroupId(Long memberId, String groupId);
     List<FoodRecordEntity> findByConsumedDate(LocalDate date);
-
     List<FoodRecordEntity> findByMemberIdAndConsumedDate(Long memberId, LocalDateTime consumedDate);
-
 }

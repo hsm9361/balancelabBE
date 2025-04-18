@@ -15,9 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_FOOD_RECORD",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "consumed_date"})}
-)
+@Table(name = "TB_FOOD_RECORD")
 @Getter
 @Setter
 @NoArgsConstructor
