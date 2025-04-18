@@ -27,6 +27,8 @@ public class MemberUpdateDto {
     @Size(max = 10, message = "Gender must be less than 10 characters")
     private String gender;
 
+    private String membername;
+
     //목표 몸무게
     private Double goalWeight;
 

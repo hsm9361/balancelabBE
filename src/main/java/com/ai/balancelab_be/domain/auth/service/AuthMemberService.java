@@ -13,11 +13,12 @@ public class AuthMemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberEntity saveIfNotExists(String email, String sub) {
+    public MemberEntity saveIfNotExists(String email, String sub, String username) {
         return memberRepository.findByEmail(email).orElseGet(() -> {
             MemberEntity newMemberEntity = new MemberEntity();
             newMemberEntity.setEmail(email);
             newMemberEntity.setSub(sub);
+            newMemberEntity.setMembername(username);
             return memberRepository.save(newMemberEntity);
         });
     }

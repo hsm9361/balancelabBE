@@ -65,6 +65,7 @@ public class MemberService {
         return MemberInfoDto.builder()
                 .id(member.getId())
                 .username(member.getUsername())
+                .membername(member.getMembername())
                 .email(member.getEmail())
                 .sub(member.getSub())
                 .age(member.getAge())
@@ -125,7 +126,7 @@ public class MemberService {
         }
 
         // 나머지 필드 업데이트
-        if (updateDto.getUsername() != null) member.setUsername(updateDto.getUsername());
+        if (updateDto.getMembername() != null) member.setMembername(updateDto.getMembername());
         if (updateDto.getAge() != null) member.setAge(updateDto.getAge());
         if (updateDto.getHeight() != null) member.setHeight(updateDto.getHeight());
         if (updateDto.getWeight() != null) member.setWeight(updateDto.getWeight());
