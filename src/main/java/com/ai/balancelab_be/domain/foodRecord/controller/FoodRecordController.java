@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.domain.foodRecord.controller;
 
+import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto;
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordDto;
 import com.ai.balancelab_be.domain.foodRecord.service.FoodRecordService;
 import com.ai.balancelab_be.global.security.CustomUserDetails;
@@ -106,6 +107,29 @@ public class FoodRecordController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    // 특정 회원의 월간 식단 기록을 가져오는 엔드포인트
+    @GetMapping("/member/range")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<FoodRecordCountDto>> getFoodRecordsByMemberAndMonth(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("startDate") String startDateStr,
+            @RequestParam("endDate") String endDateStr) {
+        System.out.println("확인");
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            LocalDateTime startDate = LocalDate.parse(startDateStr).atStartOfDay();
+            LocalDateTime endDate = LocalDate.parse(endDateStr).atTime(23, 59, 59);
+            List<FoodRecordCountDto> records = foodRecordService.getFoodRecordCounts(
+                    userDetails.getMemberId(), startDate, endDate);
+            return ResponseEntity.ok(records);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
 
     // 기존 식단 기록을 업데이트하는 엔드포인트
