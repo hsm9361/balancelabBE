@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,23 +34,43 @@ public class DietAnalysisService {
     private final DeficientNutrientRepository deficientNutrientRepository;
     private final RecommendedMealRepository recommendedMealRepository;
 
-    // FastAPI로부터 분석 결과 가져오기
     public DietAnalysisResponse fetchFastApiResponse(DietAnalysisRequest request) {
         try {
             String url = fastApiUrl + "/analysis/diet";
             System.out.println("서비스단체크 (요청 데이터): " + request.getMessage());
 
             DietAnalysisResponse response = restTemplate.postForObject(url, request, DietAnalysisResponse.class);
-            if (response != null && response.getFoodList() != null && !response.getFoodList().isEmpty()) {
-                System.out.println("서비스단체크(foodList) " + response.getFoodList());
-                System.out.println("서비스단체크(nutritionPerFood) " + response.getNutritionPerFood());
-                System.out.println("서비스단체크(totalNutrition) " + response.getTotalNutrition());
-                System.out.println("서비스단체크(deficientNutrients) " + response.getDeficientNutrients());
-                System.out.println("서비스단체크(nextMealSuggestion) " + response.getNextMealSuggestion());
-                return response;
+            if (response != null && response.getFoodList() != null) {
+                List<String> foodList = response.getFoodList().stream()
+                        .filter(food -> food != null && !food.trim().isEmpty() && !isInvalidFoodEntry(food))
+                        .collect(Collectors.toList());
+
+                if (foodList.isEmpty()) {
+                    System.out.println("서비스단체크: foodList가 비어 있거나 유효하지 않음: " + response.getFoodList());
+                    return new DietAnalysisResponse(
+                            Collections.emptyList(),
+                            Collections.emptyList(),
+                            new Nutrition(0, 0, 0, 0, 0, 0, 0),
+                            Collections.emptyList(),
+                            Collections.emptyList()
+                    );
+                }
+
+                System.out.println("서비스단체크(foodList): " + foodList);
+                System.out.println("서비스단체크(nutritionPerFood): " + response.getNutritionPerFood());
+                System.out.println("서비스단체크(totalNutrition): " + response.getTotalNutrition());
+                System.out.println("서비스단체크(deficientNutrients): " + response.getDeficientNutrients());
+                System.out.println("서비스단체크(nextMealSuggestion): " + response.getNextMealSuggestion());
+
+                return new DietAnalysisResponse(
+                        foodList,
+                        response.getNutritionPerFood(),
+                        response.getTotalNutrition(),
+                        response.getDeficientNutrients(),
+                        response.getNextMealSuggestion()
+                );
             } else {
                 System.out.println("서비스단체크: FastAPI로부터 응답이 null이거나 foodList가 비어 있습니다.");
-                // 빈객체 생성(분석 결과 없음을 나타내서 안전한 응답 제공)
                 return new DietAnalysisResponse(
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -59,7 +80,7 @@ public class DietAnalysisService {
                 );
             }
         } catch (Exception e) {
-            System.err.println("서비스단체크(FastAPI 호출 실패) " + e.getMessage());
+            System.err.println("서비스단체크(FastAPI 호출 실패): " + e.getMessage());
             e.printStackTrace();
             return new DietAnalysisResponse(
                     Collections.emptyList(),
@@ -71,13 +92,19 @@ public class DietAnalysisService {
         }
     }
 
-    // DB에 분석 결과 저장
+    private boolean isInvalidFoodEntry(String food) {
+        if (food == null) return true;
+        String trimmed = food.trim();
+        return trimmed.isEmpty() ||
+                trimmed.equals("[]") ||
+                trimmed.equals("[\"\"]") ||
+                trimmed.matches("(?s).*```.*\\[\\].*```.*"); // 수정된 정규 표현식
+    }
+
     @Transactional
     public void saveDietAnalysis(DietAnalysisRequest request, DietAnalysisResponse response) {
-        // groupId 생성
         Long groupId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
-        // ConsumedFood 저장
         List<FoodNutrition> nutritionPerFood = response.getNutritionPerFood() != null ?
                 response.getNutritionPerFood() : Collections.emptyList();
         Long memberId = request.getMemberId();
@@ -106,7 +133,6 @@ public class DietAnalysisService {
             consumedFoodRepository.save(consumedFood);
         }
 
-        // DeficientNutrient 저장
         DeficientNutrient deficientNutrient = new DeficientNutrient();
         deficientNutrient.setGroupId(groupId);
         deficientNutrient.setRegDate(LocalDate.now());
@@ -122,7 +148,6 @@ public class DietAnalysisService {
         deficientNutrient.setSodium(deficientNutrients.contains("나트륨"));
         deficientNutrientRepository.save(deficientNutrient);
 
-        // RecommendedMeal 저장
         List<String> nextMealSuggestions = response.getNextMealSuggestion() != null ?
                 response.getNextMealSuggestion() : Collections.emptyList();
         for (String meal : nextMealSuggestions) {
@@ -134,16 +159,10 @@ public class DietAnalysisService {
         }
     }
 
-    // FastAPI 호출 + DB 저장
     @Transactional
     public DietAnalysisResponse getDietAnalysisResponse(DietAnalysisRequest request) {
-        // 1. FastAPI로부터 결과 가져오기
         DietAnalysisResponse response = fetchFastApiResponse(request);
-
-        // 2. DB에 저장
 //        saveDietAnalysis(request, response);
-
-        // 3. 결과 반환
         return response;
     }
 }
