@@ -2,6 +2,7 @@ package com.ai.balancelab_be.domain.foodRecord.repository;
 
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto;
 import com.ai.balancelab_be.domain.foodRecord.entity.FoodRecordEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ public interface FoodRecordRepository extends JpaRepository<FoodRecordEntity, Lo
     List<FoodRecordEntity> findByMemberId(Long memberId);
     List<FoodRecordEntity> findByMemberIdAndGroupId(Long memberId, String groupId);
     List<FoodRecordEntity> findByConsumedDate(LocalDate date);
-    List<FoodRecordEntity> findByMemberIdAndConsumedDate(Long memberId, LocalDateTime consumedDate);
+    List<FoodRecordEntity> findByMemberIdAndConsumedDate(Long memberId, LocalDateTime consumedDate, Sort sort);
     List<FoodRecordEntity> findByMemberIdAndConsumedDateBetween(Long memberId, LocalDateTime startDate, LocalDateTime endDate);
     @Query("SELECT new com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto(COUNT(f.consumedDate), f.consumedDate) " +
             "FROM FoodRecordEntity f " +
