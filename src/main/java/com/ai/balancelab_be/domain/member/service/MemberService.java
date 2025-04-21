@@ -3,8 +3,12 @@ package com.ai.balancelab_be.domain.member.service;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.ai.balancelab_be.domain.member.dto.MemberInfoDto;
 import com.ai.balancelab_be.domain.member.dto.MemberUpdateDto;
+import com.ai.balancelab_be.domain.member.entity.GoalNutritionEntity;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
+import com.ai.balancelab_be.domain.member.entity.WeightHistoryEntity;
+import com.ai.balancelab_be.domain.member.repository.GoalNutritionRepository;
 import com.ai.balancelab_be.domain.member.repository.MemberRepository;
+import com.ai.balancelab_be.domain.member.repository.WeightHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -26,8 +31,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService {
-
+    private final WeightHistoryRepository weightHistoryRepository;
     private final MemberRepository memberRepository;
+    private final GoalNutritionRepository goalNutritionRepository;
+
     @Value("${app.upload.dir}")
     private String uploadDir; // application.yml에서 주입받은 경로
 
@@ -129,12 +136,87 @@ public class MemberService {
         if (updateDto.getMembername() != null) member.setMembername(updateDto.getMembername());
         if (updateDto.getAge() != null) member.setAge(updateDto.getAge());
         if (updateDto.getHeight() != null) member.setHeight(updateDto.getHeight());
-        if (updateDto.getWeight() != null) member.setWeight(updateDto.getWeight());
+
+        // 체중 변경시 WeightHistory 기록
+        if (updateDto.getWeight() != null && !updateDto.getWeight().equals(member.getWeight())) {
+            double newWeight = updateDto.getWeight();
+
+            // 몸무게 업데이트
+            member.setWeight(newWeight);
+
+            // 히스토리 저장
+            WeightHistoryEntity weightHistory = WeightHistoryEntity.builder()
+                    .member(member)
+                    .weight(newWeight)
+                    .build();
+            weightHistoryRepository.save(weightHistory);
+        }
+
         if (updateDto.getGender() != null) member.setGender(updateDto.getGender());
         if (updateDto.getActivityLevel() != null) member.setActivityLevel(updateDto.getActivityLevel());
         if (updateDto.getGoalWeight() != null) member.setGoalWeight(updateDto.getGoalWeight());
 
         memberRepository.save(member);
+
+        if (updateDto.getGender() != null &&
+                updateDto.getWeight() != null &&
+                updateDto.getHeight() != null &&
+                updateDto.getAge() != null &&
+                updateDto.getActivityLevel() != null) {
+
+            double weight = updateDto.getWeight();
+            double height = updateDto.getHeight();
+            int age = updateDto.getAge();
+            String gender = updateDto.getGender();
+            String activityLevel = updateDto.getActivityLevel();
+
+            Double tdee = calculateTdee(weight, height, age, gender, activityLevel);
+
+            if (tdee != null && updateDto.getGoalWeight() != null) {
+                double currentWeight = weight;
+                double goalWeight = updateDto.getGoalWeight();
+                double weightDiff = currentWeight - goalWeight;
+
+                // 하루 칼로리 차감량 계산
+                double totalDeficit = weightDiff * 7700; // 1kg 감량 = 약 7700kcal
+                double dailyDeficit = totalDeficit / updateDto.getGoalPeriod(); // 6개월 기준
+
+                // 증량인 경우 (goalWeight > currentWeight) => dailyDeficit 음수됨
+                double goalCalories = tdee - dailyDeficit;
+
+                double carbRatio = updateDto.getCarbRatio();  // 사용자 입력: 탄수화물 비율
+                double proteinRatio = updateDto.getProteinRatio();  // 사용자 입력: 단백질 비율
+                double fatRatio = updateDto.getFatRatio();  // 사용자 입력: 지방 비율
+
+                // 단백질: 체중 * 2g, 지방: 체중 * 1g
+                double goalProtein = (goalCalories * proteinRatio) / 100 / 4;  // 1g 단백질 = 4kcal
+                double goalFat = (goalCalories * fatRatio) / 100 / 9;  // 1g 지방 = 9kcal
+                double remainingCalories = goalCalories - (goalProtein * 4 + goalFat * 9);
+                double goalCarbo = remainingCalories / 4;  // 1g 탄수화물 = 4kcal
+
+                GoalNutritionEntity goal = goalNutritionRepository.findByMember(member).orElse(null);
+
+                if (goal == null) {
+                    goal = GoalNutritionEntity.builder()
+                            .member(member)
+                            .tdeeCalories(tdee)
+                            .goalCalories(goalCalories)
+                            .goalCarbo(goalCarbo)
+                            .goalProtein(goalProtein)
+                            .goalFat(goalFat)
+                            .build();
+                } else {
+                    goal.setTdeeCalories(tdee);
+                    goal.setGoalCalories(goalCalories);
+                    goal.setGoalCarbo(goalCarbo);
+                    goal.setGoalProtein(goalProtein);
+                    goal.setGoalFat(goalFat);
+                }
+
+                goalNutritionRepository.save(goal);
+            }
+        }
+
 
         return MemberInfoDto.builder()
                 .id(member.getId())
@@ -149,4 +231,31 @@ public class MemberService {
                 .goalWeight(member.getGoalWeight())
                 .build();
     }
+
+    // Tdee 계산하는 메서드 추가
+    private Double calculateTdee(double weight, double height, int age, String gender, String activityLevel) {
+        double bmr;
+
+        if ("male".equalsIgnoreCase(gender)) {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        } else if ("female".equalsIgnoreCase(gender)) {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+        } else {
+            return null;
+        }
+
+        Map<String, Double> activityFactors = Map.of(
+                "sedentary", 1.2,
+                "lightly_active", 1.375,
+                "moderately_active", 1.55,
+                "very_active", 1.725,
+                "extra_active", 1.9
+        );
+
+        Double factor = activityFactors.get(activityLevel.toLowerCase());
+        if (factor == null) return null;
+
+        return bmr * factor;
+    }
+
 }

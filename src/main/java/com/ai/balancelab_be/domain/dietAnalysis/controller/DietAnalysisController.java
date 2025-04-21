@@ -38,10 +38,9 @@ public class DietAnalysisController {
             // message를 앞뒤 공백을 제거한 후 빈 문자열인지 혹은 null인지 확인
             if (message == null || message.trim().isEmpty()) {
                 System.out.println("message가 비어 있음");
-                // 빈 데이터 리턴(분석 결과 없음)
-                return ResponseEntity.badRequest().body(
+                return ResponseEntity.ok( // badRequest 대신 ok로 변경하여 정상 응답으로 처리
                         new DietAnalysisResponse(
-                                Collections.emptyList(),
+                                Collections.emptyList(), // 빈 배열 반환
                                 Collections.emptyList(),
                                 new Nutrition(0, 0, 0, 0, 0, 0, 0),
                                 Collections.emptyList(),
@@ -53,19 +52,14 @@ public class DietAnalysisController {
             Long memberId = userDetails.getMemberId();
             DietAnalysisRequest dietAnalysisRequest = new DietAnalysisRequest(message, memberId, mealTime);
             DietAnalysisResponse response = dietAnalysisService.getDietAnalysisResponse(dietAnalysisRequest);
-            System.out.println("컨트롤러 (서비스에서 넘어온 전체값): " + response);
             System.out.println("컨트롤러 (foodList): " + response.getFoodList());
-            System.out.println("컨트롤러 (nutritionPerFood): " + response.getNutritionPerFood());
-            System.out.println("컨트롤러 (totalNutrition): " + response.getTotalNutrition());
-            System.out.println("컨트롤러 (deficientNutrients): " + response.getDeficientNutrients());
-            System.out.println("컨트롤러 (nextMealSuggestion): " + response.getNextMealSuggestion());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.err.println("컨트롤러 오류 발생: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(
+            return ResponseEntity.ok( // 에러 발생 시에도 빈 배열 반환
                     new DietAnalysisResponse(
-                            Collections.emptyList(),
+                            Collections.emptyList(), // 빈 배열 반환
                             Collections.emptyList(),
                             new Nutrition(0, 0, 0, 0, 0, 0, 0),
                             Collections.emptyList(),

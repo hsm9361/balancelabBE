@@ -32,6 +32,21 @@ public class MemberUpdateDto {
     //목표 몸무게
     private Double goalWeight;
 
+    // 목표 기간
+    private Integer goalPeriod;
+
+    // 체중 감량 스타일
+    private String dietStyle;
+
+    // 목표 탄수화물
+    private Double carbRatio;
+
+    // 목표 단백질
+    private Double proteinRatio;
+
+    // 목표 지방
+    private Double fatRatio;
+
     //활동량
     private String activityLevel;
 
