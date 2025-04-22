@@ -45,9 +45,11 @@ public class ChallengeController {
     }
 
     // 진행 중인 챌린지 조회
-    @GetMapping("/user/{userId}/ongoing")
-    public ResponseEntity<Challenge> getOngoingChallenge(@PathVariable Long userId) {
-        Challenge challenge = challengeService.checkOngoingChallenge(userId);
+    @GetMapping("/user/ongoing")
+    public ResponseEntity<Challenge> getOngoingChallenge(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        System.out.println("얍");
+        Long memberId = userDetails.getMemberId();
+        Challenge challenge = challengeService.checkOngoingChallenge(memberId);
         return challenge != null ? ResponseEntity.ok(challenge) : ResponseEntity.notFound().build();
     }
 
