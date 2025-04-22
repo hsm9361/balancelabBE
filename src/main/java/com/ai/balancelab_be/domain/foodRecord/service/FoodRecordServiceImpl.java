@@ -6,6 +6,7 @@ import com.ai.balancelab_be.domain.foodRecord.entity.FoodRecordEntity;
 import com.ai.balancelab_be.domain.foodRecord.repository.FoodRecordRepository;
 import com.ai.balancelab_be.global.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +74,8 @@ public class FoodRecordServiceImpl implements FoodRecordService {
 
     @Override
     public List<FoodRecordDto> findByMemberIdAndConsumedDate(Long memberId, LocalDateTime consumedDate) {
-        List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndConsumedDate(memberId, consumedDate);
+        Sort sort = Sort.by(Sort.Direction.ASC, "mealTime");
+        List<FoodRecordEntity> entities = foodRecordRepository.findByMemberIdAndConsumedDate(memberId, consumedDate, sort);
         return entities.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
