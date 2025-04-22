@@ -3,6 +3,8 @@ package com.ai.balancelab_be.domain.challenge.controller;
 import com.ai.balancelab_be.domain.challenge.dto.ChallengeDTO;
 import com.ai.balancelab_be.domain.challenge.entitiy.Challenge;
 import com.ai.balancelab_be.domain.challenge.service.ChallengeService;
+import com.ai.balancelab_be.domain.member.dto.WeightHistoryDTO;
+import com.ai.balancelab_be.domain.member.service.WeightHistoryService;
 import com.ai.balancelab_be.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,7 @@ import java.util.Map;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+    private final WeightHistoryService weightHistoryService;
 
     // 챌린지 등록
     @PostMapping("/create")
@@ -57,5 +62,23 @@ public class ChallengeController {
     public ResponseEntity<String> failChallenge(@PathVariable Long challengeId) {
         challengeService.failChallenge(challengeId);
         return ResponseEntity.ok("챌린지 중단 처리 완료.");
+    }
+
+    @GetMapping("/user/weight-history")
+    public ResponseEntity<List<WeightHistoryDTO>> getWeightHistory(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("startDate") String startDate) {
+        if (userDetails == null) {
+            System.out.println("No authentication details provided");
+            return ResponseEntity.status(401).body(Collections.emptyList());
+        }
+        Long memberId = userDetails.getMemberId();
+        try {
+            LocalDateTime startDateTime = LocalDateTime.parse(startDate + "T00:00:00");
+            List<WeightHistoryDTO> history = weightHistoryService.getWeightHistory(memberId, startDateTime);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.emptyList());
+        }
     }
 }
