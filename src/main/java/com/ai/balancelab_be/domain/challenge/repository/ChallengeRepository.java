@@ -9,8 +9,12 @@ import java.util.Optional;
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     // 특정 사용자의 모든 챌린지 목록을 가져오기
-    List<Challenge> findByMemberId(Long memberId);
+    List<Challenge> findByMemberIdOrderByEndDateDesc(Long memberId);
 
     // 특정 사용자의 진행 중인 챌린지 찾기
+    Optional<Challenge> findByMemberIdAndIsCompletedFalseAndStatus(Long memberId, Challenge.ChallengeStatus status);
+
+    // 기존코드
     Optional<Challenge> findByMemberIdAndIsCompleted(Long memberId, boolean isCompleted);
+    
 }

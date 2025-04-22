@@ -1,5 +1,6 @@
 package com.ai.balancelab_be.domain.challenge.dto;
 
+import com.ai.balancelab_be.domain.challenge.entitiy.Challenge;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,15 +10,21 @@ import java.time.LocalDate;
 @Setter
 public class ChallengeDTO {
 
-    private Long memberId;  // 사용자 ID
+    private Long memberId;
 
-    private String goal;  // 목표 (다이어트, 건강관리, 근성장 등)
+    private String goal;
 
-    private String period;  // 기간 (개월, 년)
+    private String period;
 
-    private Integer targetWeight;  // 목표 체중
+    private String periodUnit;
 
-    private LocalDate startDate;  // 시작 날짜
+    private Integer startWeight;
 
-    private LocalDate endDate;  // 종료 날짜
+    private Integer targetWeight;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    private Challenge.ChallengeStatus status;
 }

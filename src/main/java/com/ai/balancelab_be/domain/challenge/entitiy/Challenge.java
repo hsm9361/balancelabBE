@@ -1,9 +1,6 @@
 package com.ai.balancelab_be.domain.challenge.entitiy;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,20 +14,32 @@ public class Challenge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;  // 사용자 식별자 (사용자 ID)
+    private Long memberId;
 
-    private String goal;  // 목표 (예: 다이어트, 건강관리 등)
+    private String goal;
 
-    private String period;  // 기간 (개월, 년)
+    private String period;
 
-    private Integer targetWeight;  // 목표 체중
+    private String periodUnit;
 
-    private LocalDate startDate;  // 시작 날짜
+    private Integer startWeight;
 
-    private LocalDate endDate;  // 종료 날짜
+    private Integer targetWeight;
 
-    private boolean isCompleted;  // 완료 여부
+    private LocalDate startDate;
 
-    private LocalDate regDate;  // 챌린지 등록 날짜
+    private LocalDate endDate;
+
+    private boolean isCompleted;
+
+    private LocalDate regDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChallengeStatus status = ChallengeStatus.ONGOING;
+
+    public enum ChallengeStatus {
+        ONGOING, COMPLETED, FAILED
+    }
 
 }
