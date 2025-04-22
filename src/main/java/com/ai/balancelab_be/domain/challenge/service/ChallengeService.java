@@ -22,6 +22,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 @Service
@@ -35,15 +36,27 @@ public class ChallengeService {
     // 챌린지 등록
     @Transactional
     public Challenge createChallenge(ChallengeDTO challengeDTO) {
+        // 진행 중인 챌린지 확인
+        Challenge existingChallenge = checkOngoingChallenge(challengeDTO.getMemberId());
+        if (existingChallenge != null) {
+            throw new IllegalStateException("이미 진행 중인 챌린지가 있습니다.");
+        }
+
         Challenge challenge = new Challenge();
         challenge.setMemberId(challengeDTO.getMemberId());
         challenge.setGoal(challengeDTO.getGoal());
         challenge.setPeriod(challengeDTO.getPeriod());
+        challenge.setPeriodUnit(challengeDTO.getPeriodUnit());
+        challenge.setStartWeight(challengeDTO.getStartWeight());
         challenge.setTargetWeight(challengeDTO.getTargetWeight());
         challenge.setStartDate(LocalDate.now());
-        challenge.setEndDate(challengeDTO.getEndDate() != null ? challengeDTO.getEndDate() :
-                challenge.getStartDate().plusMonths(Long.parseLong(challengeDTO.getPeriod())));
+        challenge.setEndDate(
+                challengeDTO.getEndDate() != null
+                        ? challengeDTO.getEndDate()
+                        : LocalDate.now().plusMonths(Long.parseLong(challengeDTO.getPeriod()))
+        );
         challenge.setCompleted(false);
+        challenge.setStatus(Challenge.ChallengeStatus.ONGOING);
         challenge.setRegDate(LocalDate.now());
 
         // Save the challenge first to ensure it exists regardless of nutrition API status
@@ -132,20 +145,46 @@ public class ChallengeService {
     }
 
     // 사용자의 모든 챌린지 조회
+    @Transactional(readOnly = true)
     public List<Challenge> getChallengesByUserId(Long userId) {
-        return challengeRepository.findByMemberId(userId);
+        return challengeRepository.findByMemberIdOrderByEndDateDesc(userId);
     }
 
     // 진행 중인 챌린지 확인
+    @Transactional
     public Challenge checkOngoingChallenge(Long userId) {
-        return challengeRepository.findByMemberIdAndIsCompleted(userId, false).orElse(null);
+        Optional<Challenge> challengeOpt = challengeRepository.findByMemberIdAndIsCompletedFalseAndStatus(
+                userId, Challenge.ChallengeStatus.ONGOING);
+
+        if (challengeOpt.isPresent()) {
+            Challenge challenge = challengeOpt.get();
+            LocalDate currentDate = LocalDate.now();
+            LocalDate endDate = challenge.getEndDate();
+
+            // endDate가 지난 경우 완료 처리
+            if (currentDate.isAfter(endDate)) {
+                challenge.setCompleted(true);
+                challenge.setStatus(Challenge.ChallengeStatus.COMPLETED);
+                challengeRepository.save(challenge);
+                return null; // 완료된 챌린지는 진행 중으로 간주하지 않음
+            }
+            return challenge;
+        }
+        return null;
     }
 
-    // 챌린지 실패 처리 (기간이 지나지 않았어도 실패한 경우)
+    // 챌린지 실패 처리
+    @Transactional
     public void failChallenge(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new RuntimeException("챌린지를 찾을 수 없습니다."));
-        challenge.setCompleted(true);  // 실패 처리
+
+        if (challenge.isCompleted()) {
+            throw new IllegalStateException("이미 완료된 챌린지입니다.");
+        }
+
+        challenge.setCompleted(true);
+        challenge.setStatus(Challenge.ChallengeStatus.FAILED);
         challengeRepository.save(challenge);
     }
 }
