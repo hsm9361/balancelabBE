@@ -1,6 +1,5 @@
 package com.ai.balancelab_be.domain.foodRecord.entity;
 
-import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +10,6 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -52,6 +50,10 @@ public class FoodRecordEntity {
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
     private Double fiber;
 
+    @Comment("칼로리")
+    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double calories;
+
     @Comment("단백질")
     @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
     private Double protein;
@@ -75,6 +77,10 @@ public class FoodRecordEntity {
     @Comment("단위 (g, serving)")
     @Column(nullable = false)
     private String unit;
+
+    @Comment("분석됨")
+    @Builder.Default
+    private boolean analyzed = false;
 
     @Comment("먹은 양")
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")

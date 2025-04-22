@@ -5,15 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface DailyNutritionRecordRepository extends JpaRepository<DailyNutritionRecordEntity, Long> {
     List<DailyNutritionRecordEntity> findByMemberEntity_IdAndConsumedDateBetween(
-            Long member_id,
-            LocalDate start,
-            LocalDate end);
-    boolean existsByMemberEntity_IdAndConsumedDate(Long memberId, LocalDate recordDate);
+            Long memberId, LocalDate start, LocalDate end);
 
+    boolean existsByMemberEntity_IdAndConsumedDate(Long memberId, LocalDate recordDate);
 }

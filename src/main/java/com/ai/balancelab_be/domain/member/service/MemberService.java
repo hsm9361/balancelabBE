@@ -1,5 +1,8 @@
 package com.ai.balancelab_be.domain.member.service;
 
+import com.ai.balancelab_be.domain.foodRecord.dto.DailyNutritionRecordDto;
+import com.ai.balancelab_be.domain.foodRecord.entity.DailyNutritionRecordEntity;
+import com.ai.balancelab_be.domain.member.dto.GoalNutritionDto;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.ai.balancelab_be.domain.member.dto.MemberInfoDto;
 import com.ai.balancelab_be.domain.member.dto.MemberUpdateDto;
@@ -158,66 +161,6 @@ public class MemberService {
 
         memberRepository.save(member);
 
-        if (updateDto.getGender() != null &&
-                updateDto.getWeight() != null &&
-                updateDto.getHeight() != null &&
-                updateDto.getAge() != null &&
-                updateDto.getActivityLevel() != null) {
-
-            double weight = updateDto.getWeight();
-            double height = updateDto.getHeight();
-            int age = updateDto.getAge();
-            String gender = updateDto.getGender();
-            String activityLevel = updateDto.getActivityLevel();
-
-            Double tdee = calculateTdee(weight, height, age, gender, activityLevel);
-
-            if (tdee != null && updateDto.getGoalWeight() != null) {
-                double currentWeight = weight;
-                double goalWeight = updateDto.getGoalWeight();
-                double weightDiff = currentWeight - goalWeight;
-
-                // 하루 칼로리 차감량 계산
-                double totalDeficit = weightDiff * 7700; // 1kg 감량 = 약 7700kcal
-                double dailyDeficit = totalDeficit / updateDto.getGoalPeriod(); // 6개월 기준
-
-                // 증량인 경우 (goalWeight > currentWeight) => dailyDeficit 음수됨
-                double goalCalories = tdee - dailyDeficit;
-
-                double carbRatio = updateDto.getCarbRatio();  // 사용자 입력: 탄수화물 비율
-                double proteinRatio = updateDto.getProteinRatio();  // 사용자 입력: 단백질 비율
-                double fatRatio = updateDto.getFatRatio();  // 사용자 입력: 지방 비율
-
-                // 단백질: 체중 * 2g, 지방: 체중 * 1g
-                double goalProtein = (goalCalories * proteinRatio) / 100 / 4;  // 1g 단백질 = 4kcal
-                double goalFat = (goalCalories * fatRatio) / 100 / 9;  // 1g 지방 = 9kcal
-                double remainingCalories = goalCalories - (goalProtein * 4 + goalFat * 9);
-                double goalCarbo = remainingCalories / 4;  // 1g 탄수화물 = 4kcal
-
-                GoalNutritionEntity goal = goalNutritionRepository.findByMember(member).orElse(null);
-
-                if (goal == null) {
-                    goal = GoalNutritionEntity.builder()
-                            .member(member)
-                            .tdeeCalories(tdee)
-                            .goalCalories(goalCalories)
-                            .goalCarbo(goalCarbo)
-                            .goalProtein(goalProtein)
-                            .goalFat(goalFat)
-                            .build();
-                } else {
-                    goal.setTdeeCalories(tdee);
-                    goal.setGoalCalories(goalCalories);
-                    goal.setGoalCarbo(goalCarbo);
-                    goal.setGoalProtein(goalProtein);
-                    goal.setGoalFat(goalFat);
-                }
-
-                goalNutritionRepository.save(goal);
-            }
-        }
-
-
         return MemberInfoDto.builder()
                 .id(member.getId())
                 .username(member.getUsername())
@@ -258,4 +201,29 @@ public class MemberService {
         return bmr * factor;
     }
 
+    public GoalNutritionDto findGoalNutritionByMemberId(Long memberId) {
+        log.info("Finding goal nutrition for memberId: {}", memberId);
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: ID " + memberId));
+        log.info("Found member: {}", member.getId());
+        GoalNutritionEntity entity = goalNutritionRepository.findByMember(member)
+                .orElse(null);
+        log.info("Found goal nutrition: {}", entity != null ? entity.getId() : null);
+        if (entity == null) {
+            return null;
+        }
+        return toDto(entity);
+    }
+
+    private GoalNutritionDto toDto(GoalNutritionEntity entity) {
+        return GoalNutritionDto.builder()
+                .id(entity.getId())
+                .memberId(entity.getMember().getId())
+                .tdeeCalories(entity.getTdeeCalories())
+                .goalCalories(entity.getGoalCalories())
+                .goalProtein(entity.getGoalProtein())
+                .goalCarbo(entity.getGoalCarbo())
+                .goalFat(entity.getGoalFat())
+                .build();
+    }
 }

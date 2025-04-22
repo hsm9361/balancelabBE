@@ -1,5 +1,8 @@
 package com.ai.balancelab_be.domain.member.controller;
 
+import com.ai.balancelab_be.domain.foodRecord.dto.DailyNutritionRecordDto;
+import com.ai.balancelab_be.domain.foodRecord.service.DailyNutritionRecordService;
+import com.ai.balancelab_be.domain.member.dto.GoalNutritionDto;
 import com.ai.balancelab_be.domain.member.dto.MemberDto;
 import com.ai.balancelab_be.domain.member.dto.MemberInfoDto;
 import com.ai.balancelab_be.domain.member.dto.MemberUpdateDto;
@@ -20,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import com.ai.balancelab_be.global.security.CustomUserDetails;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
@@ -28,6 +33,7 @@ public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
+    private final DailyNutritionRecordService dailyNutritionRecordService;
 
     @PostMapping("/fetchUserInfo")
     public ResponseEntity<MemberDto> fetchUserInfo(Authentication authentication) {
@@ -83,5 +89,33 @@ public class MemberController {
         updateDto.setProfileImage(profileImage);
         MemberInfoDto updated = memberService.updateMember(userDetails.getMemberId(), updateDto);
         return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/nutrition-records")
+    public ResponseEntity<List<DailyNutritionRecordDto>> getFoodRecords(
+            Authentication authentication,
+            @RequestParam String dateRange) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMemberId();
+            List<DailyNutritionRecordDto> records = dailyNutritionRecordService.findRecordsByMemberIdAndDateRange(
+                    memberId, dateRange);
+            return ResponseEntity.ok(records);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/goal")
+    public ResponseEntity<GoalNutritionDto> fetchGoalNutrition(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long memberId = userDetails.getMemberId();
+            GoalNutritionDto goal = memberService.findGoalNutritionByMemberId(memberId);
+            if (goal == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(goal);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

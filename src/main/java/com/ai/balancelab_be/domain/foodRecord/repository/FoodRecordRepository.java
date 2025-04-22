@@ -1,6 +1,7 @@
 package com.ai.balancelab_be.domain.foodRecord.repository;
 
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto;
+import com.ai.balancelab_be.domain.foodRecord.dto.NutritionSumDto;
 import com.ai.balancelab_be.domain.foodRecord.entity.FoodRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,28 @@ public interface FoodRecordRepository extends JpaRepository<FoodRecordEntity, Lo
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+    List<FoodRecordEntity> findTop15ByAnalyzedIsFalseOrderByConsumedDateAsc();
+
+    @Query("""
+        SELECT new com.ai.balancelab_be.domain.foodRecord.dto.NutritionSumDto(
+            SUM(f.calories),
+            SUM(f.carbohydrates),
+            SUM(f.protein),
+            SUM(f.fiber),
+            SUM(f.sugar),
+            SUM(f.sodium),
+            SUM(f.fat),
+            FUNCTION('DATE', f.consumedDate)
+        )
+        FROM FoodRecordEntity f
+        WHERE f.memberId = :memberId
+        AND f.consumedDate >= :startDate
+        GROUP BY FUNCTION('DATE', f.consumedDate)
+        ORDER BY FUNCTION('DATE', f.consumedDate) DESC
+        """)
+    List<NutritionSumDto> getWeeklyNutritionSum(
+            @Param("memberId") Long memberId,
+            @Param("startDate") LocalDateTime startDate
+    );
+
 }

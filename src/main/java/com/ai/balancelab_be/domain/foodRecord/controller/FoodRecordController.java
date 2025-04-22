@@ -2,6 +2,8 @@ package com.ai.balancelab_be.domain.foodRecord.controller;
 
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordCountDto;
 import com.ai.balancelab_be.domain.foodRecord.dto.FoodRecordDto;
+import com.ai.balancelab_be.domain.foodRecord.dto.NutritionSumDto;
+import com.ai.balancelab_be.domain.foodRecord.service.DailyNutritionRecordService;
 import com.ai.balancelab_be.domain.foodRecord.service.FoodRecordService;
 import com.ai.balancelab_be.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class FoodRecordController {
 
     private final FoodRecordService foodRecordService;
+    private final DailyNutritionRecordService dailyNutritionRecordService;
 
     // 새로운 식단 기록을 생성하는 엔드포인트
     // 사용자가 인증된 경우에만 호출 가능하며, FoodRecordDto를 받아 DB에 저장
@@ -168,5 +171,14 @@ public class FoodRecordController {
         }
         foodRecordService.deleteFoodRecord(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/nutrition-summary")
+    public ResponseEntity<List<NutritionSumDto>> getNutritionSummary(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        List<NutritionSumDto> summary = dailyNutritionRecordService.getWeeklyNutritionSum(user.getMemberId());
+        System.out.println(summary);
+        return ResponseEntity.ok(summary);
     }
 }
