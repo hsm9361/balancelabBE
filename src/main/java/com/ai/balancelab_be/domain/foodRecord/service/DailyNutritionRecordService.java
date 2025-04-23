@@ -173,7 +173,6 @@ public class DailyNutritionRecordService {
 
     public List<NutritionSumDto> getWeeklyNutritionSum(Long memberId) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(6).toLocalDate().atStartOfDay(); // 최근 7일 포함
-        System.out.println(foodRecordRepository.getWeeklyNutritionSum(memberId, startDate));
         return foodRecordRepository.getWeeklyNutritionSum(memberId, startDate);
     }
 

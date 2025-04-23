@@ -1,5 +1,7 @@
 package com.ai.balancelab_be.domain.healthPrediction.service;
 
+import com.ai.balancelab_be.domain.foodRecord.dto.NutritionSumDto;
+import com.ai.balancelab_be.domain.foodRecord.repository.FoodRecordRepository;
 import com.ai.balancelab_be.domain.healthPrediction.dto.HealthPredictionRequest;
 import com.ai.balancelab_be.domain.healthPrediction.dto.PredictionSaveDto;
 import com.ai.balancelab_be.domain.healthPrediction.entity.PredictRecord;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.lang.reflect.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +32,7 @@ public class HealthPredictionService {
 
     private final MemberRepository memberRepository;
     private final DailyNutritionRecordRepository dailyNutritionRecordRepository;
+    private final FoodRecordRepository foodRecordRepository;
     private final RestTemplate restTemplate;
     private final PredictRecordRepository predictRecordRepository;
 
@@ -39,10 +43,10 @@ public class HealthPredictionService {
     public ResponseEntity<String> predictHealth(HealthPredictionRequest dto) {
         Long memberId = dto.getMemberId();
         // 최근 7일간의 기록 조회
-        LocalDate today = LocalDate.from(LocalDate.now().atStartOfDay());
-
-        LocalDate endDate = today.minusDays(1); //어제
+        LocalDate today = LocalDate.now(); // 오늘 날짜만 필요하므로 LocalDate.now()를 직접 사용
+        LocalDate endDate = today.minusDays(1); // 어제
         LocalDate startDate = endDate.minusDays(6);
+        LocalDateTime startDateTime = startDate.atStartOfDay(); // 필요하다면 startDate에 시간 정보를 붙여 LocalDateTime으로 변환
 
         Optional<MemberEntity> memberOptional = memberRepository.findById(memberId);
         if (memberOptional.isEmpty()) {
@@ -51,8 +55,8 @@ public class HealthPredictionService {
         MemberEntity member = memberOptional.get();
 
 
-        List<DailyNutritionRecordEntity> records = dailyNutritionRecordRepository.findByMemberEntity_IdAndConsumedDateBetween(
-                memberId, startDate, endDate);
+        List<NutritionSumDto> records = foodRecordRepository.getWeeklyNutritionSum(
+                memberId, startDateTime);
 
         // FastAPI 요청 객체 생성
         HealthPredictionRequest request = new HealthPredictionRequest();
@@ -78,13 +82,13 @@ public class HealthPredictionService {
             double totalFibrin = 0;
             double totalWater = 0;
 
-            for (DailyNutritionRecordEntity record : records) {
-                totalCarbo += record.getCarbo();
-                totalSugar += record.getSugar();
-                totalFat += record.getFat();
-                totalSodium += record.getSodium();
-                totalFibrin += record.getFibrin();
-                totalWater += record.getWater();
+            for (NutritionSumDto record : records) {
+                totalCarbo = record.getSumCarbohydrates();
+                totalSugar = record.getSumSugar();
+                totalFat = record.getSumFat();
+                totalSodium = record.getSumSodium();
+                totalFibrin = record.getSumFiber();
+                totalWater = record.getSumWater();
             }
 
             int recordCount = records.size();
@@ -94,6 +98,7 @@ public class HealthPredictionService {
             request.setDailySodium(Math.round((totalSodium / recordCount) * 100.0) / 100.0);
             request.setDailyFibrin(Math.round((totalFibrin / recordCount) * 100.0) / 100.0);
             request.setDailyWater(Math.round((totalWater / recordCount) * 100.0) / 100.0);
+
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("등록된 식단이 없습니다!");

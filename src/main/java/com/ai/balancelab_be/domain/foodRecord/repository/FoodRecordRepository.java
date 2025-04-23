@@ -39,6 +39,7 @@ public interface FoodRecordRepository extends JpaRepository<FoodRecordEntity, Lo
             SUM(f.sugar),
             SUM(f.sodium),
             SUM(f.fat),
+            SUM(f.water),
             FUNCTION('DATE', f.consumedDate)
         )
         FROM FoodRecordEntity f

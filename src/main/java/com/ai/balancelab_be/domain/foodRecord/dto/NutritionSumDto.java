@@ -1,15 +1,12 @@
 package com.ai.balancelab_be.domain.foodRecord.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class NutritionSumDto {
@@ -20,5 +17,6 @@ public class NutritionSumDto {
     private Double sumSugar;
     private Double sumSodium;
     private Double sumFat;
+    private Double sumWater;
     private Date consumedDate;
 }

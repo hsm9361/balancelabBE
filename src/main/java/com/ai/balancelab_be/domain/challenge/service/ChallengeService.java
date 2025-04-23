@@ -186,5 +186,10 @@ public class ChallengeService {
         challenge.setCompleted(true);
         challenge.setStatus(Challenge.ChallengeStatus.FAILED);
         challengeRepository.save(challenge);
+        Long memberId = challenge.getMemberId();
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("Member not found with ID: " + memberId));
+        Optional<GoalNutritionEntity> goalNutritionOpt = goalNutritionRepository.findByMember(member);
+        goalNutritionOpt.ifPresent(goalNutrition -> goalNutritionRepository.delete(goalNutrition));
     }
 }
