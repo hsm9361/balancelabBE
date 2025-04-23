@@ -37,8 +37,6 @@ public class DietAnalysisService {
     public DietAnalysisResponse fetchFastApiResponse(DietAnalysisRequest request) {
         try {
             String url = fastApiUrl + "/analysis/diet";
-            System.out.println("서비스단체크 (요청 데이터): " + request.getMessage());
-
             DietAnalysisResponse response = restTemplate.postForObject(url, request, DietAnalysisResponse.class);
             if (response != null && response.getFoodList() != null) {
                 List<String> foodList = response.getFoodList().stream()
@@ -46,7 +44,6 @@ public class DietAnalysisService {
                         .collect(Collectors.toList());
 
                 if (foodList.isEmpty()) {
-                    System.out.println("서비스단체크: foodList가 비어 있거나 유효하지 않음: " + response.getFoodList());
                     return new DietAnalysisResponse(
                             Collections.emptyList(),
                             Collections.emptyList(),
@@ -56,12 +53,6 @@ public class DietAnalysisService {
                     );
                 }
 
-                System.out.println("서비스단체크(foodList): " + foodList);
-                System.out.println("서비스단체크(nutritionPerFood): " + response.getNutritionPerFood());
-                System.out.println("서비스단체크(totalNutrition): " + response.getTotalNutrition());
-                System.out.println("서비스단체크(deficientNutrients): " + response.getDeficientNutrients());
-                System.out.println("서비스단체크(nextMealSuggestion): " + response.getNextMealSuggestion());
-
                 return new DietAnalysisResponse(
                         foodList,
                         response.getNutritionPerFood(),
@@ -70,7 +61,6 @@ public class DietAnalysisService {
                         response.getNextMealSuggestion()
                 );
             } else {
-                System.out.println("서비스단체크: FastAPI로부터 응답이 null이거나 foodList가 비어 있습니다.");
                 return new DietAnalysisResponse(
                         Collections.emptyList(),
                         Collections.emptyList(),

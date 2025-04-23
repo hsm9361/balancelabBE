@@ -44,7 +44,6 @@ public class ChallengeController {
     // 사용자의 모든 챌린지 조회
     @GetMapping("/user/challenges")
     public ResponseEntity<List<Challenge>> getChallenges(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        System.out.println("확인");
         Long memberId = userDetails.getMemberId();
         List<Challenge> challenges = challengeService.getChallengesByUserId(memberId);
         return ResponseEntity.ok(challenges);
@@ -69,7 +68,6 @@ public class ChallengeController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("startDate") String startDate) {
         if (userDetails == null) {
-            System.out.println("No authentication details provided");
             return ResponseEntity.status(401).body(Collections.emptyList());
         }
         Long memberId = userDetails.getMemberId();
