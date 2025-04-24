@@ -82,7 +82,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    private void fetchAndSaveNutritionData(Long memberId, Integer targetWeight, LocalDate endDate) {
+    private void fetchAndSaveNutritionData(Long memberId, double targetWeight, LocalDate endDate) {
         try {
             // JSON 페이로드 준비
             ObjectMapper objectMapper = new ObjectMapper();
@@ -172,9 +172,40 @@ public class ChallengeService {
             MemberEntity member = memberRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Member not found with ID: " + userId));
             Optional<GoalNutritionEntity> goalNutritionOpt = goalNutritionRepository.findByMember(member);
+            Double currentWeight = member.getWeight();
+            Double targetWeight = challenge.getTargetWeight();
+            String goal = challenge.getGoal();
 
-            // endDate가 지난 경우 or 목표체중에 도달하면 완료 처리
-            if (currentDate.isAfter(endDate) || member.getWeight() == challengeOpt.get().getTargetWeight()) {
+            // 완료 조건 확인
+            boolean isCompleted = false;
+            if (currentDate.isAfter(endDate)) {
+                // 기간 만료 시 완료 처리
+                isCompleted = true;
+            } else if (currentWeight != null) {
+                // 목표 달성 여부 확인
+                switch (goal) {
+                    case "감소":
+                        if (currentWeight <= targetWeight) {
+                            isCompleted = true;
+                        }
+                        break;
+                    case "증가":
+                        if (currentWeight >= targetWeight) {
+                            isCompleted = true;
+                        }
+                        break;
+                    case "유지":
+                        if (currentWeight == targetWeight) {
+                            isCompleted = true;
+                        }
+                        break;
+                    default:
+                        System.out.println("Invalid goal: " + goal);
+                        // 유효하지 않은 goal은 완료 처리하지 않음
+                }
+            }
+
+            if (isCompleted) {
                 challenge.setCompleted(true);
                 challenge.setStatus(Challenge.ChallengeStatus.COMPLETED);
                 challengeRepository.save(challenge);
@@ -185,9 +216,9 @@ public class ChallengeService {
                         System.out.println("GoalNutrition 삭제 실패: " + e.getMessage());
                     }
                 });
-
-                return null;
+                return null; // 완료된 챌린지는 진행 중으로 간주하지 않음
             }
+
             return challenge;
         }
         return null;
