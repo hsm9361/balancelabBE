@@ -7,10 +7,12 @@ import com.ai.balancelab_be.domain.member.entity.GoalNutritionEntity;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
 import com.ai.balancelab_be.domain.member.repository.GoalNutritionRepository;
 import com.ai.balancelab_be.domain.member.repository.MemberRepository;
+import com.ai.balancelab_be.domain.member.service.GoalNutritionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,9 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
+
+    @Autowired
+    private GoalNutritionService goalNutritionService;
 
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
@@ -164,12 +169,24 @@ public class ChallengeService {
             LocalDate currentDate = LocalDate.now();
             LocalDate endDate = challenge.getEndDate();
 
-            // endDate가 지난 경우 완료 처리
-            if (currentDate.isAfter(endDate)) {
+            MemberEntity member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Member not found with ID: " + userId));
+            Optional<GoalNutritionEntity> goalNutritionOpt = goalNutritionRepository.findByMember(member);
+
+            // endDate가 지난 경우 or 목표체중에 도달하면 완료 처리
+            if (currentDate.isAfter(endDate) || member.getWeight() == challengeOpt.get().getTargetWeight()) {
                 challenge.setCompleted(true);
                 challenge.setStatus(Challenge.ChallengeStatus.COMPLETED);
                 challengeRepository.save(challenge);
-                return null; // 완료된 챌린지는 진행 중으로 간주하지 않음
+                goalNutritionOpt.ifPresent(goalNutrition -> {
+                    try {
+                        goalNutritionService.deleteGoalNutrition(goalNutrition.getId());
+                    } catch (Exception e) {
+                        System.out.println("GoalNutrition 삭제 실패: " + e.getMessage());
+                    }
+                });
+
+                return null;
             }
             return challenge;
         }
