@@ -101,7 +101,7 @@ public class HealthPredictionService {
 
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("등록된 식단이 없습니다!");
+                    .body("등록된 식단이 없습니다! 식단을 등록해주세요!");
         }
 
         // FastAPI 요청 헤더 설정

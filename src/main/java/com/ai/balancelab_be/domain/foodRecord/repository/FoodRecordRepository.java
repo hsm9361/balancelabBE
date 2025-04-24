@@ -46,7 +46,8 @@ public interface FoodRecordRepository extends JpaRepository<FoodRecordEntity, Lo
         WHERE f.memberId = :memberId
         AND f.consumedDate >= :startDate
         GROUP BY FUNCTION('DATE', f.consumedDate)
-        ORDER BY FUNCTION('DATE', f.consumedDate) DESC
+        ORDER BY FUNCTION('DATE', f.consumedDate)
+        LIMIT 7
         """)
     List<NutritionSumDto> getWeeklyNutritionSum(
             @Param("memberId") Long memberId,
