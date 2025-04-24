@@ -21,6 +21,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -60,52 +61,56 @@ public class ChallengeService {
         challenge.setRegDate(LocalDate.now());
 
         // Save the challenge first to ensure it exists regardless of nutrition API status
-        Challenge savedChallenge = challengeRepository.save(challenge);
+        Challenge savedChallenge = challengeRepository.saveAndFlush(challenge);
 
-        Long id = challengeDTO.getMemberId();
-
-        // Separate the nutrition data fetching to improve error handling
         try {
-            fetchAndSaveNutritionData(id);
+            fetchAndSaveNutritionData(
+                    challengeDTO.getMemberId(),
+                    challengeDTO.getTargetWeight(),
+                    challengeDTO.getEndDate() != null ? challengeDTO.getEndDate() : LocalDate.now().plusMonths(Long.parseLong(challengeDTO.getPeriod()))
+            );
         } catch (Exception e) {
-            System.out.println("Failed to fetch nutrition data for member ID {}: {}"+ id+ e.getMessage()+ e);
-            challengeRepository.save(challenge);
+            System.out.println("Failed to fetch nutrition data for member ID " + challengeDTO.getMemberId() + ": " + e.getMessage());
         }
 
         return savedChallenge;
     }
 
     @Transactional
-    private void fetchAndSaveNutritionData(Long memberId) {
+    private void fetchAndSaveNutritionData(Long memberId, Integer targetWeight, LocalDate endDate) {
         try {
-            // Prepare JSON payload
+            // JSON 페이로드 준비
             ObjectMapper objectMapper = new ObjectMapper();
-            String requestBody = objectMapper.writeValueAsString(Map.of("id", memberId));
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("id", memberId);
+            requestBody.put("target_weight", targetWeight);
+            requestBody.put("end_date", endDate.toString()); // LocalDate를 문자열로 변환
 
-            // Create HttpClient with timeout
+            String jsonRequestBody = objectMapper.writeValueAsString(requestBody);
+
+            // HttpClient 생성
             HttpClient client = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(10))
                     .build();
 
-            // Build POST request
+            // POST 요청 생성
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:8000/diet/goal-nutrition"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonRequestBody))
                     .timeout(Duration.ofSeconds(15))
                     .build();
 
-            // Send request and get response
+            // 요청 전송 및 응답 처리
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // Check if response is successful
+            // 응답 확인
             if (response.statusCode() == 200) {
-                // Parse JSON response
+                // JSON 응답 파싱
                 Map<String, Object> responseBody = objectMapper.readValue(response.body(), Map.class);
-
                 Map<String, Object> nutritionData = (Map<String, Object>) responseBody.get("data");
 
-                // Extract values
+                // 값 추출
                 Double tdee = toDouble(nutritionData.get("tdee"));
                 Double calories = toDouble(nutritionData.get("calories"));
                 Double carb = toDouble(nutritionData.get("carb"));
@@ -115,7 +120,7 @@ public class ChallengeService {
                 MemberEntity member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new EntityNotFoundException("Member not found with ID: " + memberId));
 
-                // Create or update nutrition record
+                // 영양소 레코드 생성 및 저장
                 GoalNutritionEntity record = new GoalNutritionEntity();
                 record.setMember(member);
                 record.setTdeeCalories(tdee);
@@ -124,10 +129,8 @@ public class ChallengeService {
                 record.setGoalProtein(protein);
                 record.setGoalFat(fat);
 
-                // Save the nutrition entity
                 goalNutritionRepository.save(record);
             } else {
-                // Log response body for debugging
                 throw new ServiceException("Failed to fetch nutrition data: " + response.statusCode());
             }
         } catch (ConnectException e) {
