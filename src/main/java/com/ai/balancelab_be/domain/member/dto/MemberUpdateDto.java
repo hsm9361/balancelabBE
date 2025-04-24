@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,6 +30,8 @@ public class MemberUpdateDto {
     private String gender;
 
     private String membername;
+
+    private LocalDate birthDate;
 
     //목표 몸무게
     private Double goalWeight;

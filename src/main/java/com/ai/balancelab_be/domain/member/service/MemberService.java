@@ -85,6 +85,7 @@ public class MemberService {
                 .goalWeight(member.getGoalWeight())
                 .activityLevel(member.getActivityLevel())
                 .profileImageUrl(member.getProfileImageUrl())
+                .birthDate(member.getBirthDate())
                 .build();
     }
 
@@ -158,6 +159,7 @@ public class MemberService {
         if (updateDto.getGender() != null) member.setGender(updateDto.getGender());
         if (updateDto.getActivityLevel() != null) member.setActivityLevel(updateDto.getActivityLevel());
         if (updateDto.getGoalWeight() != null) member.setGoalWeight(updateDto.getGoalWeight());
+        if (updateDto.getBirthDate() != null) member.setBirthDate(updateDto.getBirthDate());
 
         memberRepository.save(member);
 
@@ -172,6 +174,7 @@ public class MemberService {
                 .profileImageUrl(member.getProfileImageUrl())
                 .activityLevel(member.getActivityLevel())
                 .goalWeight(member.getGoalWeight())
+                .birthDate(member.getBirthDate())
                 .build();
     }
 

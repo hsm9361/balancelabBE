@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +40,10 @@ public class MemberEntity implements UserDetails {
     @Comment("나이")
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer age = 0; // 필드 초기화
+
+    @Comment("생년월일")
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Comment("키")
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
