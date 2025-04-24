@@ -18,9 +18,9 @@ public class ChallengeDTO {
 
     private String periodUnit;
 
-    private Integer startWeight;
+    private double startWeight;
 
-    private Integer targetWeight;
+    private double targetWeight;
 
     private LocalDate startDate;
 

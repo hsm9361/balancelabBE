@@ -22,9 +22,9 @@ public class Challenge {
 
     private String periodUnit;
 
-    private Integer startWeight;
+    private double startWeight;
 
-    private Integer targetWeight;
+    private double targetWeight;
 
     private LocalDate startDate;
 
