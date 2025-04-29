@@ -1,6 +1,6 @@
 package com.ai.balancelab_be.domain.challenge.repository;
 
-import com.ai.balancelab_be.domain.challenge.entitiy.Challenge;
+import com.ai.balancelab_be.domain.challenge.entity.Challenge;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

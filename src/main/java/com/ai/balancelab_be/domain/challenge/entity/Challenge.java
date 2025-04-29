@@ -1,4 +1,4 @@
-package com.ai.balancelab_be.domain.challenge.entitiy;
+package com.ai.balancelab_be.domain.challenge.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

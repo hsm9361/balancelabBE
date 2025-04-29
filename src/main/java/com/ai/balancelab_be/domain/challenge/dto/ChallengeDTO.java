@@ -1,6 +1,6 @@
 package com.ai.balancelab_be.domain.challenge.dto;
 
-import com.ai.balancelab_be.domain.challenge.entitiy.Challenge;
+import com.ai.balancelab_be.domain.challenge.entity.Challenge;
 import lombok.Getter;
 import lombok.Setter;
 

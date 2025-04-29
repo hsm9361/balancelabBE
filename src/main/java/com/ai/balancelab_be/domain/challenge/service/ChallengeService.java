@@ -1,7 +1,7 @@
 package com.ai.balancelab_be.domain.challenge.service;
 
 import com.ai.balancelab_be.domain.challenge.dto.ChallengeDTO;
-import com.ai.balancelab_be.domain.challenge.entitiy.Challenge;
+import com.ai.balancelab_be.domain.challenge.entity.Challenge;
 import com.ai.balancelab_be.domain.challenge.repository.ChallengeRepository;
 import com.ai.balancelab_be.domain.member.entity.GoalNutritionEntity;
 import com.ai.balancelab_be.domain.member.entity.MemberEntity;
